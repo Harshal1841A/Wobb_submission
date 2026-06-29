@@ -7,7 +7,7 @@ import { AddToListButton } from "@/components/AddToListButton";
 import { ShortlistPanel } from "@/components/ShortlistPanel";
 import { GrowthChart } from "@/components/GrowthChart";
 import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
-import { formatCount, formatEngagementRate, formatPlatformLabel } from "@/lib/formatters";
+import { formatCount, formatEngagementRate, formatPlatformLabel, formatPaidPerformance } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
 
 interface StatProps {
@@ -130,6 +130,20 @@ export function ProfileDetailPage() {
               <Stat label="Avg views" value={formatCount(user.avg_views)} />
             )}
             {user.engagements !== undefined && <Stat label="Engagements" value={formatCount(user.engagements)} />}
+            {user.paid_post_performance !== undefined && (
+              <div
+                className="p-3 rounded-xl border-l-2 border-l-[var(--verified)]"
+                style={{ background: "var(--surface-raised)", borderTop: "1px solid var(--border)", borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}
+              >
+                <div className="flex items-center justify-between text-xs" style={{ color: "var(--text-faint)" }}>
+                  <span>Paid signal</span>
+                  <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-[var(--verified)] text-[#0b0b10]">PRO</span>
+                </div>
+                <div className={`font-semibold mt-0.5 text-xs sm:text-sm ${formatPaidPerformance(user.paid_post_performance).tintClass}`}>
+                  {formatPaidPerformance(user.paid_post_performance).label}
+                </div>
+              </div>
+            )}
           </div>
 
           <GrowthChart data={user.stat_history} />

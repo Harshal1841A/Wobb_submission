@@ -44,6 +44,10 @@ Kept the visual identity intentional rather than templated:
 - Signature element: an **engagement heat bar** on every card — a thin gradient bar whose width is driven directly by `engagement_rate`, so the most decision-relevant metric for a brand manager is scannable at a glance, not just printed as text
 - Responsive grid (1/2/3 columns), visible keyboard focus rings, `prefers-reduced-motion` respected, full keyboard support on cards (`role="button"`, `tabIndex`, Enter/Space handling)
 
+### Wow Factor Features
+- **Follower Growth Chart**: Interactive `recharts` line chart plotting historical follower trajectory with an average likes comparison toggle.
+- **Paid-Post Performance Signal**: Visual commercial signal badge comparing paid vs. organic engagement scores.
+
 ### Code quality / structure
 ```
 src/

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCount, formatEngagementRate, formatPlatformLabel, formatMonthLabel } from "@/lib/formatters";
+import { formatCount, formatEngagementRate, formatPlatformLabel, formatMonthLabel, formatPaidPerformance } from "@/lib/formatters";
 
 describe("formatCount", () => {
   it("formats millions", () => {
@@ -41,5 +41,21 @@ describe("formatMonthLabel", () => {
   });
   it("returns original string if malformed", () => {
     expect(formatMonthLabel("invalid")).toBe("invalid");
+  });
+});
+
+describe("formatPaidPerformance", () => {
+  it("handles undefined/NaN", () => {
+    expect(formatPaidPerformance(undefined)).toEqual({ label: "N/A", tintClass: "text-[var(--text-faint)]" });
+    expect(formatPaidPerformance(NaN)).toEqual({ label: "N/A", tintClass: "text-[var(--text-faint)]" });
+  });
+  it("handles score >= 1.2", () => {
+    expect(formatPaidPerformance(1.25)).toEqual({ label: "Strong (+20% vs organic)", tintClass: "text-[var(--verified)]" });
+  });
+  it("handles 0.8 <= score < 1.2", () => {
+    expect(formatPaidPerformance(1.0)).toEqual({ label: "On par with organic", tintClass: "text-[var(--text)]" });
+  });
+  it("handles score < 0.8", () => {
+    expect(formatPaidPerformance(0.54)).toEqual({ label: "Underperforms organic", tintClass: "text-[var(--danger)]" });
   });
 });

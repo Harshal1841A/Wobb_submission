@@ -53,3 +53,22 @@ export function formatMonthLabel(monthStr: string): string {
   return monthStr;
 }
 
+export interface PaidPerformanceResult {
+  label: string;
+  tintClass: string;
+}
+
+export function formatPaidPerformance(score: number | undefined): PaidPerformanceResult {
+  if (score === undefined || Number.isNaN(score)) {
+    return { label: "N/A", tintClass: "text-[var(--text-faint)]" };
+  }
+  if (score >= 1.2) {
+    return { label: "Strong (+20% vs organic)", tintClass: "text-[var(--verified)]" };
+  }
+  if (score >= 0.8) {
+    return { label: "On par with organic", tintClass: "text-[var(--text)]" };
+  }
+  return { label: "Underperforms organic", tintClass: "text-[var(--danger)]" };
+}
+
+
