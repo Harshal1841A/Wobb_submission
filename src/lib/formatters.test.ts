@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCount, formatEngagementRate, formatPlatformLabel } from "@/lib/formatters";
+import { formatCount, formatEngagementRate, formatPlatformLabel, formatMonthLabel } from "@/lib/formatters";
 
 describe("formatCount", () => {
   it("formats millions", () => {
@@ -31,5 +31,15 @@ describe("formatPlatformLabel", () => {
     expect(formatPlatformLabel("youtube")).toBe("YouTube");
     expect(formatPlatformLabel("instagram")).toBe("Instagram");
     expect(formatPlatformLabel("tiktok")).toBe("TikTok");
+  });
+});
+
+describe("formatMonthLabel", () => {
+  it("formats YYYY-MM into MMM YYYY", () => {
+    expect(formatMonthLabel("2023-02")).toBe("Feb 2023");
+    expect(formatMonthLabel("2023-12")).toBe("Dec 2023");
+  });
+  it("returns original string if malformed", () => {
+    expect(formatMonthLabel("invalid")).toBe("invalid");
   });
 });

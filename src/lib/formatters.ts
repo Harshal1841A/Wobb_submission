@@ -35,3 +35,21 @@ export function formatPlatformLabel(platform: string): string {
       return platform;
   }
 }
+
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
+/** Format a "YYYY-MM" string into "MMM YYYY" (e.g. "2023-02" -> "Feb 2023"). */
+export function formatMonthLabel(monthStr: string): string {
+  const parts = monthStr.split("-");
+  if (parts.length < 2) return monthStr;
+  const year = parts[0];
+  const monthIdx = parseInt(parts[1], 10) - 1;
+  if (monthIdx >= 0 && monthIdx < 12) {
+    return `${MONTH_NAMES[monthIdx]} ${year}`;
+  }
+  return monthStr;
+}
+

@@ -36,6 +36,11 @@ export interface FullUserProfile extends UserProfileSummary {
   avg_reels_plays?: number;
   gender?: string;
   age_group?: string;
+  stat_history?: { month: string; followers: number; following?: number; avg_likes?: number }[];
+  paid_post_performance?: number;
+  brand_affinity?: { id: number; name: string; interest?: { id: number; name: string }[] }[];
+  similar_users?: { user_id: string; username: string; picture: string; fullname: string; followers: number; is_verified: boolean; url: string; engagements?: number; score: number }[];
+  top_hashtags?: { tag: string; weight: number }[];
 }
 
 export interface ProfileDetailResponse {

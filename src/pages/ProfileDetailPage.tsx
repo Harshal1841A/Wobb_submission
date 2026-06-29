@@ -5,6 +5,7 @@ import { Layout } from "@/components/Layout";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { AddToListButton } from "@/components/AddToListButton";
 import { ShortlistPanel } from "@/components/ShortlistPanel";
+import { GrowthChart } from "@/components/GrowthChart";
 import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
 import { formatCount, formatEngagementRate, formatPlatformLabel } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
@@ -130,6 +131,8 @@ export function ProfileDetailPage() {
             )}
             {user.engagements !== undefined && <Stat label="Engagements" value={formatCount(user.engagements)} />}
           </div>
+
+          <GrowthChart data={user.stat_history} />
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <AddToListButton profile={user} platform={knownPlatform} variant="full" />

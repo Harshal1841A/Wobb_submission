@@ -63,6 +63,7 @@ src/
 - `zustand` — shortlist state + persistence
 - `@hello-pangea/dnd` — drag-to-reorder in shortlist panel (React 19 compatible)
 - `@tanstack/react-virtual` — window/container virtualization for profile grid
+- `recharts` — follower growth & average likes chart visualization
 - `lucide-react` — icon set (replaces a bare `✓` text glyph for the verified badge, etc.)
 - `vitest` + `@testing-library/react` + `@testing-library/jest-dom` + `jsdom` (dev) — unit tests
 - `@playwright/test` (dev) — headless end-to-end testing against dev/build server
