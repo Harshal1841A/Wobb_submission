@@ -146,6 +146,24 @@ export function ProfileDetailPage() {
             )}
           </div>
 
+          {user.brand_affinity && user.brand_affinity.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold mb-2.5" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
+                Brand Affinities
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {user.brand_affinity.map((brand) => (
+                  <span
+                    key={brand.id}
+                    className="rounded-full bg-[var(--surface-raised)] border border-[var(--border)] px-3 py-1 text-xs text-[var(--text)]"
+                  >
+                    {brand.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           <GrowthChart data={user.stat_history} />
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
