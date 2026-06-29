@@ -1,80 +1,84 @@
-# Wobb Frontend Assignment
+# Scout — Influencer Discovery (Wobb Vibe Coder Assignment)
 
-A starter influencer search application built with **React**, **TypeScript**, **Vite**, and **Tailwind CSS**. This project is intentionally left in a rough-but-working state for candidates to improve.
+Redesigned influencer search app. React 19 + TypeScript + Vite + Tailwind v4 + Zustand.
 
-## Getting Started
+## Running it
 
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:5173
+npm run build    # production build
+npm run lint      # eslint
+npm run test      # vitest (formatters + shortlist store)
 ```
 
-Open [http://localhost:5173](http://localhost:5173) to view the app.
+## What changed
 
-## What's Included
+### Bugs fixed
+- **Engagement rate inflated 100x.** `ProfileDetailPage` multiplied the engagement fraction by `10000` instead of `100` (e.g. 2.46% rendered as "246.00%"). Fixed and locked in with a regression test in `src/lib/formatters.test.ts`.
+- **Case-sensitive username search.** `filterProfiles` lowercased the full-name match but not the username match, so searching `"Mr"` wouldn't match a username containing `"mr"` in a different case. Both sides now lowercase consistently.
+- **Triplicated, inconsistent follower-count formatter.** The same "1.2M / 3.4K" logic was reimplemented three times (`utils/formatters.ts`, inline in `ProfileCard`, inline in `ProfileDetailPage`), with subtly different rounding. Consolidated into one `formatCount` in `src/lib/formatters.ts`.
+- **Dead, unused `SearchBar.tsx`.** Never imported anywhere — `PlatformFilter` had its own inline input. Removed.
+- **Stale/dead click-counter state in `SearchPage`.** Leftover `clickCount` state updated via a stale closure (`setClickCount(clickCount + 1)`) and never rendered anywhere. Removed.
+- **Missing `alt` text** on every profile image (accessibility failure for screen readers). Added descriptive `alt` on all `<img>` tags.
+- **`target="_blank"` without `rel="noopener noreferrer"`** on outbound profile links — a tab-nabbing security smell. Fixed on every external link.
+- **Non-responsive fixed-width card** (`w-[700px]`) that broke on mobile. Replaced with a responsive grid.
+- **Recomputing the full search dataset on every render** (`extractProfiles` ran on each keystroke/re-render with no memoization). Wrapped in `useMemo` via a new `useProfileSearch` hook.
+- **`react-beautiful-dnd` dependency** in `package.json` was incompatible with React 19 and failed to install. It wasn't used anywhere in the app — removed.
 
-- **Search / Dashboard** — filter influencers by platform (Instagram, YouTube, TikTok) and search by username or full name
-- **Profile Details** — click a profile to view extended data loaded from individual JSON files
-- **Routing** — `react-router-dom` with `/` (search) and `/profile/:username` (details)
+### State management — Zustand
+There was no `Context` actually wired up in the starter code yet (the task description anticipates you'd reach for it for the shortlist feature). Built the shortlist directly in Zustand instead: `src/store/shortlistStore.ts`, with the `persist` middleware backing onto `localStorage` so the list survives a page refresh.
 
-Sample data lives in:
+### "Add to List" feature
+Fully implemented (`src/store/shortlistStore.ts` + `src/components/AddToListButton.tsx` + `src/components/ShortlistPanel.tsx`):
+- Add/remove profiles from any card or the profile detail page
+- Duplicate-proof: keyed by `platform:user_id`, so adding the same profile twice is a no-op
+- A profile with the same `user_id` on two different platforms is treated as two distinct entries (deliberate — they're different accounts)
+- Persistent shortlist rail (slide-over panel), opened from the header on every page, showing avatar, handle, platform, follower count, with quick remove and an external link
+- Survives page refresh via `zustand/persist` → `localStorage`
 
-- `src/assets/data/search/` — platform search results (10 profiles each)
-- `src/assets/data/profiles/` — detailed profile JSON per username
+### Redesign
+Kept the visual identity intentional rather than templated:
+- Dark UI (`#0b0b10` base) with a single warm-vermilion accent (`#ff5c39`) — picked specifically to avoid the two most common "AI-generated" defaults (acid-green-on-black, cream/serif)
+- Sora (display) + Inter (body) + JetBrains Mono (for every number — followers, engagement, stats) so data reads as data
+- Signature element: an **engagement heat bar** on every card — a thin gradient bar whose width is driven directly by `engagement_rate`, so the most decision-relevant metric for a brand manager is scannable at a glance, not just printed as text
+- Responsive grid (1/2/3 columns), visible keyboard focus rings, `prefers-reduced-motion` respected, full keyboard support on cards (`role="button"`, `tabIndex`, Enter/Space handling)
 
-## How to Submit
+### Code quality / structure
+```
+src/
+  components/   # presentational + interactive UI
+  pages/        # route-level components
+  store/        # zustand stores
+  hooks/        # useProfileSearch, useDebouncedValue
+  lib/          # formatters.ts — single source of truth, +tests
+  utils/        # dataHelpers.ts, profileLoader.ts
+  types/        # shared TS types
+```
+- Search input debounced (150ms) before filtering, so typing doesn't re-filter the full list on every keystroke
+- `AddToListButton` is one shared component used by both the card and the detail page, instead of two separate stub implementations
+- Race condition guard in `ProfileDetailPage`: if you navigate between two profiles quickly, a stale fetch response can no longer overwrite the newer one
 
-1. **Download or clone** this starter project to your machine.
-2. **Create a new repository** on your own GitHub account. Do not fork the original assignment repo — push your work to a repo you own.
-3. Complete the tasks below and push your changes to that repository.
-4. **Share the public GitHub repository URL** with us as your submission.
+## Libraries added
+- `zustand` — shortlist state + persistence
+- `lucide-react` — icon set (replaces a bare `✓` text glyph for the verified badge, etc.)
+- `vitest` + `@testing-library/react` + `@testing-library/jest-dom` + `jsdom` (dev) — unit tests
 
-### Deadline (strict)
+## Removed
+- `react-beautiful-dnd` — unused, and incompatible with React 19 (failed `npm install` outright)
 
-- **Due:** **2 July 2026, 2:00 PM IST** (Indian Standard Time, UTC+5:30)
-- **Any git commits made after this deadline will disqualify your submission.** We will only consider the repository state as of the deadline; late commits will not be reviewed.
-- Make sure your final work is pushed **before** the cutoff.
+## Assumptions
+- "Replace Context with Zustand" is interpreted as "use Zustand for the shortlist state" — no `Context` provider existed in the starter code to literally replace.
+- Shortlist persistence uses `localStorage` (via `zustand/persist`), which satisfies "persistent after page refresh." A backend wasn't in scope.
+- Engagement-rate ceiling for the heat-bar visualization (8%) is a reasonable-but-arbitrary choice for typical Instagram/YouTube/TikTok engagement; not derived from the dataset.
 
-## AI Usage
+## Trade-offs
+- No drag-to-reorder in the shortlist panel — `react-beautiful-dnd` was dropped (broken on React 19) and a maintained replacement wasn't worth pulling in for a "nice to have" given the deadline.
+- No virtualization on the profile grid — the sample datasets are small (10 per platform); would revisit with `@tanstack/react-virtual` if the dataset were large.
+- Tests cover the highest-risk logic (the engagement-rate bug, shortlist dedupe/persistence behavior) rather than full component coverage, given time constraints.
 
-You may use any AI tools (Cursor, ChatGPT, Claude, GitHub Copilot, etc.). We are evaluating your final solution and engineering decisions.
-
-## Your Tasks
-
-Complete the following as part of your submission:
-
-1. **Find and fix all bugs and quality issues** — the codebase contains intentional bugs and quality issues. Identify and resolve them.
-
-2. **Completely redesign the UI/UX** — replace the basic layout with a polished, modern interface. Focus on usability, visual hierarchy, and delight.
-
-3. **Replace React Context with Zustand** — when you implement state management for the selected list, use [Zustand](https://github.com/pmndrs/zustand) instead of React Context.
-
-4. **Implement "Select profile & Add to List"** — the disabled "Add to List" button is a stub. Build the full feature:
-   - Select / add profiles to a persistent list
-   - View and manage the selected list
-   - Handle duplicates appropriately
-
-5. **Improve code quality and project structure** — refactor as needed, add proper types, and follow React best practices.
-
-6. **Optimize performance** — apply sensible optimizations where appropriate.
-
-7. **Use any libraries you need** — you are not limited to the current stack. Choose tools that help you deliver a great result (UI kits, state managers, testing libraries, etc.).
-
-## Scripts
-
-| Command        | Description              |
-| -------------- | ------------------------ |
-| `npm run dev`  | Start development server |
-| `npm run build`| Production build         |
-| `npm run lint` | Run ESLint               |
-
-## Submission Notes
-
-- Document any assumptions or trade-offs in your README
-- Ensure `npm run build` passes before submitting
-- Focus on demonstrating your judgment — not every possible feature needs to be built, but the core assignment items should be addressed thoughtfully
-- Double-check that your repo is public (or that we have access) and that the link is included in your submission
-- Please make meaningful commits throughout your work. We may review your commit history.
-- **Bonus:** Deploying the app (e.g. Vercel, Netlify, GitHub Pages) is optional but will be considered a plus — include the live URL in your submission if you do
-
-Good luck!
+## Remaining improvements (given more time)
+- E2E test for the full add → refresh → still-there flow (Playwright)
+- Sort/filter the shortlist panel (e.g. by platform, by follower count)
+- Empty/error states for the rare case a profile JSON is missing (currently shown, but could offer a retry)
+- Deploy to Vercel and link the live URL here
