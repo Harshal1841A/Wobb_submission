@@ -1,31 +1,32 @@
 import type { Platform, UserProfileSummary } from "@/types";
 import { ProfileCard } from "./ProfileCard";
+import { SearchX } from "lucide-react";
 
 interface ProfileListProps {
   profiles: UserProfileSummary[];
   platform: Platform;
-  searchQuery: string;
-  onProfileClick: (username: string) => void;
 }
 
-export function ProfileList({
-  profiles,
-  platform,
-  searchQuery,
-  onProfileClick,
-}: ProfileListProps) {
+export function ProfileList({ profiles, platform }: ProfileListProps) {
+  if (profiles.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
+        <SearchX size={28} style={{ color: "var(--text-faint)" }} aria-hidden="true" />
+        <p className="font-medium" style={{ color: "var(--text)" }}>No profiles found</p>
+        <p className="text-sm" style={{ color: "var(--text-faint)" }}>
+          Try a different search term or platform.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center">
-      {profiles.length === 0 && <p>No profiles found</p>}
+    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0 m-0">
       {profiles.map((profile) => (
-        <ProfileCard
-          key={profile.user_id}
-          profile={profile}
-          platform={platform}
-          searchQuery={searchQuery}
-          onProfileClick={onProfileClick}
-        />
+        <li key={profile.user_id}>
+          <ProfileCard profile={profile} platform={platform} />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
