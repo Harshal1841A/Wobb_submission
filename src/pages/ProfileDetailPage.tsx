@@ -6,6 +6,7 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { AddToListButton } from "@/components/AddToListButton";
 import { ShortlistPanel } from "@/components/ShortlistPanel";
 import { GrowthChart } from "@/components/GrowthChart";
+import { SimilarCreatorsRail } from "@/components/SimilarCreatorsRail";
 import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
 import { formatCount, formatEngagementRate, formatPlatformLabel, formatPaidPerformance } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
@@ -181,6 +182,10 @@ export function ProfileDetailPage() {
               </a>
             )}
           </div>
+
+          {user.similar_users && user.similar_users.length > 0 && (
+            <SimilarCreatorsRail similarUsers={user.similar_users} platform={knownPlatform} />
+          )}
         </div>
       </div>
 

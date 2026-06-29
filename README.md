@@ -48,6 +48,7 @@ Kept the visual identity intentional rather than templated:
 - **Follower Growth Chart**: Interactive `recharts` line chart plotting historical follower trajectory with an average likes comparison toggle.
 - **Paid-Post Performance Signal**: Visual commercial signal badge comparing paid vs. organic engagement scores.
 - **Brand Affinity Chips & Dashboard Filter**: Profile tags rendered on detail pages and a dashboard filter dropdown preloading detail data into memory.
+- **Similar Creators Rail**: Horizontally scrollable mini-cards rail at the bottom of ProfileDetailPage with engagement heat bar and navigation fallback.
 
 ### Code quality / structure
 ```

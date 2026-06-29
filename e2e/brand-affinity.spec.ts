@@ -7,7 +7,7 @@ test.describe('Brand Affinity Feature', () => {
 
     // Check that Brand Affinities section and Nike chip are visible
     await expect(page.getByText('Brand Affinities')).toBeVisible();
-    await expect(page.getByText('Nike')).toBeVisible();
+    await expect(page.locator('span').filter({ hasText: /^Nike$/ })).toBeVisible();
 
     // Navigate to search page
     await page.goto('/');
