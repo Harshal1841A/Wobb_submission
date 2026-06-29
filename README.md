@@ -61,8 +61,11 @@ src/
 
 ## Libraries added
 - `zustand` — shortlist state + persistence
+- `@hello-pangea/dnd` — drag-to-reorder in shortlist panel (React 19 compatible)
+- `@tanstack/react-virtual` — window/container virtualization for profile grid
 - `lucide-react` — icon set (replaces a bare `✓` text glyph for the verified badge, etc.)
 - `vitest` + `@testing-library/react` + `@testing-library/jest-dom` + `jsdom` (dev) — unit tests
+- `@playwright/test` (dev) — headless end-to-end testing against dev/build server
 
 ## Removed
 - `react-beautiful-dnd` — unused, and incompatible with React 19 (failed `npm install` outright)
@@ -73,12 +76,11 @@ src/
 - Engagement-rate ceiling for the heat-bar visualization (8%) is a reasonable-but-arbitrary choice for typical Instagram/YouTube/TikTok engagement; not derived from the dataset.
 
 ## Trade-offs
-- No drag-to-reorder in the shortlist panel — `react-beautiful-dnd` was dropped (broken on React 19) and a maintained replacement wasn't worth pulling in for a "nice to have" given the deadline.
-- No virtualization on the profile grid — the sample datasets are small (10 per platform); would revisit with `@tanstack/react-virtual` if the dataset were large.
-- Tests cover the highest-risk logic (the engagement-rate bug, shortlist dedupe/persistence behavior) rather than full component coverage, given time constraints.
+- Drag-to-reorder in the shortlist panel is implemented using `@hello-pangea/dnd` (React 19 compatible).
+- Profile grid virtualization uses `@tanstack/react-virtual` when list size exceeds `VIRTUALIZE_THRESHOLD` (30). Below 30 items, standard grid rendering is preserved to avoid virtualization overhead.
+- Tests cover the highest-risk logic (the engagement-rate bug, shortlist dedupe/persistence behavior) and critical user paths via Playwright E2E spec (`npm run test:e2e`).
 
 ## Remaining improvements (given more time)
-- E2E test for the full add → refresh → still-there flow (Playwright)
 - Sort/filter the shortlist panel (e.g. by platform, by follower count)
 - Empty/error states for the rare case a profile JSON is missing (currently shown, but could offer a retry)
 - Deploy to Vercel and link the live URL here

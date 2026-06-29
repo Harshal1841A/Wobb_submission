@@ -14,6 +14,7 @@ interface ShortlistState {
   remove: (userId: string, platform: Platform) => void;
   toggle: (profile: UserProfileSummary, platform: Platform) => void;
   clear: () => void;
+  reorder: (fromIndex: number, toIndex: number) => void;
   has: (userId: string, platform: Platform) => boolean;
 }
 
@@ -51,6 +52,23 @@ export const useShortlistStore = create<ShortlistState>()(
       },
 
       clear: () => set({ entries: [] }),
+
+      reorder: (fromIndex, toIndex) => {
+        set((state) => {
+          if (
+            fromIndex < 0 ||
+            fromIndex >= state.entries.length ||
+            toIndex < 0 ||
+            toIndex >= state.entries.length
+          ) {
+            return state;
+          }
+          const copy = [...state.entries];
+          const [moved] = copy.splice(fromIndex, 1);
+          copy.splice(toIndex, 0, moved);
+          return { entries: copy };
+        });
+      },
 
       has: (userId, platform) => {
         const key = keyOf(userId, platform);

@@ -48,6 +48,7 @@ export function AddToListButton({
     <button
       type="button"
       onClick={handleClick}
+      onPointerDown={(e) => { if (stopPropagation) e.stopPropagation(); }}
       aria-pressed={isAdded}
       aria-label={label}
       title={label}

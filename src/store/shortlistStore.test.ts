@@ -59,4 +59,23 @@ describe("useShortlistStore", () => {
     useShortlistStore.getState().clear();
     expect(useShortlistStore.getState().entries).toHaveLength(0);
   });
+
+  it("reorders entries from index 0 to index 2", () => {
+    useShortlistStore.getState().add(mockProfile("1"), "instagram");
+    useShortlistStore.getState().add(mockProfile("2"), "youtube");
+    useShortlistStore.getState().add(mockProfile("3"), "tiktok");
+    useShortlistStore.getState().reorder(0, 2);
+    const entries = useShortlistStore.getState().entries;
+    expect(entries.map((e) => e.profile.user_id)).toEqual(["2", "3", "1"]);
+  });
+
+  it("reorders entries from index 2 to index 0", () => {
+    useShortlistStore.getState().add(mockProfile("1"), "instagram");
+    useShortlistStore.getState().add(mockProfile("2"), "youtube");
+    useShortlistStore.getState().add(mockProfile("3"), "tiktok");
+    useShortlistStore.getState().reorder(2, 0);
+    const entries = useShortlistStore.getState().entries;
+    expect(entries.map((e) => e.profile.user_id)).toEqual(["3", "1", "2"]);
+  });
 });
+
