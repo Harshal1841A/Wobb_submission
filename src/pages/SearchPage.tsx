@@ -3,26 +3,32 @@ import type { Platform } from "@/types";
 import { Layout } from "@/components/Layout";
 import { PlatformFilter } from "@/components/PlatformFilter";
 import { ProfileList } from "@/components/ProfileList";
-import { extractProfiles, filterProfiles } from "@/utils/dataHelpers";
+import { ShortlistPanel } from "@/components/ShortlistPanel";
+import { useProfileSearch } from "@/hooks/useProfileSearch";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export function SearchPage() {
   const [platform, setPlatform] = useState<Platform>("instagram");
   const [searchQuery, setSearchQuery] = useState("");
-  const [clickCount, setClickCount] = useState(0);
+  const [shortlistOpen, setShortlistOpen] = useState(false);
 
-  const allProfiles = extractProfiles(platform);
-  const filtered = filterProfiles(allProfiles, searchQuery);
-
-  const handleProfileClick = (username: string) => {
-    setClickCount(clickCount + 1);
-    console.log("Clicked profile:", username, "total clicks:", clickCount);
-  };
+  // Debounce so filtering doesn't run on every keystroke against the full list.
+  const debouncedQuery = useDebouncedValue(searchQuery, 150);
+  const { allProfiles, filtered } = useProfileSearch(platform, debouncedQuery);
 
   return (
-    <Layout title="Find Influencers">
-      <p className="text-gray-500 mb-4 text-sm">
-        Browse top creators across social platforms
-      </p>
+    <Layout title="Find creators to shortlist" onOpenShortlist={() => setShortlistOpen(true)}>
+      <div className="mb-6">
+        <h2
+          className="text-2xl sm:text-3xl font-bold mb-1"
+          style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}
+        >
+          Find your next creator
+        </h2>
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+          Browse top accounts across Instagram, YouTube, and TikTok — shortlist the ones worth a closer look.
+        </p>
+      </div>
 
       <PlatformFilter
         selected={platform}
@@ -34,16 +40,13 @@ export function SearchPage() {
         onSearchChange={setSearchQuery}
       />
 
-      <p className="text-xs text-gray-400 mb-2">
-        Showing {filtered.length} of {allProfiles.length} on {platform}
+      <p className="text-xs mb-4" style={{ color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>
+        Showing {filtered.length} of {allProfiles.length}
       </p>
 
-      <ProfileList
-        profiles={filtered}
-        platform={platform}
-        searchQuery={searchQuery}
-        onProfileClick={handleProfileClick}
-      />
+      <ProfileList profiles={filtered} platform={platform} />
+
+      <ShortlistPanel open={shortlistOpen} onClose={() => setShortlistOpen(false)} />
     </Layout>
   );
 }

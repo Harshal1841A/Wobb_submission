@@ -1,40 +1,57 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
-import type { FullUserProfile, ProfileDetailResponse } from "@/types";
-import { formatEngagementRate } from "@/utils/formatters";
+import { AddToListButton } from "@/components/AddToListButton";
+import { ShortlistPanel } from "@/components/ShortlistPanel";
+import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
+import { formatCount, formatEngagementRate, formatPlatformLabel } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
 
-function formatFollowersDetail(count: number) {
-  if (count >= 1000000) return (count / 1000000).toFixed(2) + "M";
-  if (count >= 1000) return (count / 1000).toFixed(1) + "K";
-  return String(count);
+interface StatProps {
+  label: string;
+  value: string;
+}
+
+function Stat({ label, value }: StatProps) {
+  return (
+    <div className="p-3 rounded-xl" style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}>
+      <div className="text-xs" style={{ color: "var(--text-faint)" }}>{label}</div>
+      <div className="font-semibold mt-0.5" style={{ color: "var(--text)", fontFamily: "var(--font-mono)" }}>
+        {value}
+      </div>
+    </div>
+  );
 }
 
 export function ProfileDetailPage() {
   const { username } = useParams<{ username: string }>();
   const [searchParams] = useSearchParams();
-  const platform = searchParams.get("platform") || "unknown";
-  const [profileData, setProfileData] = useState<ProfileDetailResponse | null>(
-    null
-  );
-  const [loaded, setLoaded] = useState(false);
+  const platform = (searchParams.get("platform") || "unknown") as Platform | "unknown";
+  const [profileData, setProfileData] = useState<ProfileDetailResponse | null>(null);
+  const [fetchedFor, setFetchedFor] = useState<string | null>(null);
+  const [shortlistOpen, setShortlistOpen] = useState(false);
 
   useEffect(() => {
     if (!username) return;
-
+    let active = true;
     loadProfileByUsername(username).then((data) => {
+      if (!active) return; // ignore stale response if username changed mid-flight
       setProfileData(data);
-      setLoaded(true);
+      setFetchedFor(username);
     });
+    return () => {
+      active = false;
+    };
   }, [username]);
+
+  const loaded = fetchedFor === username;
 
   if (!username) {
     return (
       <Layout>
-        <p>Invalid profile</p>
-        <Link to="/">Back</Link>
+        <EmptyState message="Invalid profile" />
       </Layout>
     );
   }
@@ -42,7 +59,14 @@ export function ProfileDetailPage() {
   if (!loaded) {
     return (
       <Layout title={`@${username}`}>
-        <p className="text-gray-400">Loading...</p>
+        <div className="flex items-center justify-center py-24">
+          <div
+            className="w-6 h-6 rounded-full border-2 animate-spin"
+            style={{ borderColor: "var(--border-strong)", borderTopColor: "var(--accent)" }}
+            role="status"
+            aria-label="Loading profile"
+          />
+        </div>
       </Layout>
     );
   }
@@ -50,114 +74,93 @@ export function ProfileDetailPage() {
   if (!profileData) {
     return (
       <Layout title={`@${username}`}>
-        <p className="text-red-600 mb-4">
-          Could not load profile details for {username}
-        </p>
-        <Link to="/" className="text-blue-600 underline">
-          Back to search
-        </Link>
+        <EmptyState message={`Could not load profile details for @${username}`} />
       </Layout>
     );
   }
 
   const user: FullUserProfile = profileData.data.user_profile;
+  const knownPlatform: Platform = platform === "unknown" ? "instagram" : platform;
 
   return (
-    <Layout title={user.fullname}>
-      <Link to="/" className="text-sm text-blue-600 mb-4 inline-block">
-        ← Back to search
+    <Layout title={user.fullname} onOpenShortlist={() => setShortlistOpen(true)}>
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1.5 text-sm mb-6 hover:underline"
+        style={{ color: "var(--text-muted)" }}
+      >
+        <ArrowLeft size={15} aria-hidden="true" />
+        Back to search
       </Link>
 
-      <div className="flex gap-6 items-start text-left max-w-2xl mx-auto">
+      <div className="flex flex-col sm:flex-row gap-6 items-start max-w-2xl">
         <img
           src={user.picture}
-          className="w-24 h-24 rounded-full border"
+          alt={`${user.fullname}'s profile picture`}
+          className="w-24 h-24 rounded-full object-cover shrink-0"
+          style={{ border: "1px solid var(--border-strong)" }}
         />
-        <div className="flex-1">
-          <h2 className="text-xl font-bold">
+        <div className="flex-1 text-left min-w-0">
+          <h2
+            className="flex items-center gap-1.5 text-xl font-bold"
+            style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}
+          >
             @{user.username}
             <VerifiedBadge verified={user.is_verified} />
           </h2>
-          <p className="text-gray-600">{user.fullname}</p>
-          <p className="text-xs text-gray-400 mt-1">Platform: {platform}</p>
+          <p style={{ color: "var(--text-muted)" }}>{user.fullname}</p>
+          <p className="text-xs mt-1" style={{ color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>
+            {formatPlatformLabel(platform === "unknown" ? "" : platform) || "Unknown platform"}
+          </p>
 
           {user.description && (
-            <p className="mt-3 text-sm text-gray-700">{user.description}</p>
+            <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--text)" }}>
+              {user.description}
+            </p>
           )}
 
-          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="border p-2 rounded">
-              <div className="text-gray-500">Followers</div>
-              <div className="font-semibold">
-                {formatFollowersDetail(user.followers)}
-              </div>
-            </div>
-            <div className="border p-2 rounded">
-              <div className="text-gray-500">Engagement Rate</div>
-              <div className="font-semibold">
-                {user.engagement_rate !== undefined
-                  ? (user.engagement_rate * 10000).toFixed(2) + "%"
-                  : "N/A"}
-              </div>
-            </div>
-            {user.posts_count !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Posts</div>
-                <div className="font-semibold">{user.posts_count}</div>
-              </div>
-            )}
-            {user.avg_likes !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Avg Likes</div>
-                <div className="font-semibold">
-                  {formatFollowersDetail(user.avg_likes)}
-                </div>
-              </div>
-            )}
-            {user.avg_comments !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Avg Comments</div>
-                <div className="font-semibold">{user.avg_comments}</div>
-              </div>
-            )}
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <Stat label="Followers" value={formatCount(user.followers)} />
+            <Stat label="Engagement rate" value={formatEngagementRate(user.engagement_rate)} />
+            {user.posts_count !== undefined && <Stat label="Posts" value={String(user.posts_count)} />}
+            {user.avg_likes !== undefined && <Stat label="Avg likes" value={formatCount(user.avg_likes)} />}
+            {user.avg_comments !== undefined && <Stat label="Avg comments" value={formatCount(user.avg_comments)} />}
             {user.avg_views !== undefined && user.avg_views > 0 && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Avg Views</div>
-                <div className="font-semibold">
-                  {formatFollowersDetail(user.avg_views)}
-                </div>
-              </div>
+              <Stat label="Avg views" value={formatCount(user.avg_views)} />
             )}
-            {user.engagements !== undefined && (
-              <div className="border p-2 rounded">
-                <div className="text-gray-500">Engagements</div>
-                <div className="font-semibold">
-                  {formatEngagementRate(user.engagement_rate)}
-                </div>
-              </div>
-            )}
+            {user.engagements !== undefined && <Stat label="Engagements" value={formatCount(user.engagements)} />}
           </div>
 
-          {user.url && (
-            <a
-              href={user.url}
-              target="_blank"
-              className="inline-block mt-4 text-blue-600 text-sm"
-            >
-              View on platform →
-            </a>
-          )}
-
-          {/* TODO: candidates must implement Add to List feature */}
-          {/* TODO: candidates must implement Add to List feature */}
-          <button
-            disabled
-            className="block mt-4 px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed"
-          >
-            Add to List
-          </button>
+          <div className="flex flex-wrap items-center gap-3 mt-4">
+            <AddToListButton profile={user} platform={knownPlatform} variant="full" />
+            {user.url && (
+              <a
+                href={user.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm hover:underline"
+                style={{ color: "var(--text-muted)" }}
+              >
+                View on platform
+                <ExternalLink size={14} aria-hidden="true" />
+              </a>
+            )}
+          </div>
         </div>
       </div>
+
+      <ShortlistPanel open={shortlistOpen} onClose={() => setShortlistOpen(false)} />
     </Layout>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center gap-3 py-20 text-center">
+      <p style={{ color: "var(--danger)" }}>{message}</p>
+      <Link to="/" className="text-sm hover:underline" style={{ color: "var(--accent)" }}>
+        Back to search
+      </Link>
+    </div>
   );
 }
