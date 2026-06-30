@@ -99,10 +99,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "meta/llama-3.1-70b-instruct",
+        model: "nvidia/nemotron-3-ultra-550b-a55b",
         messages: [{ role: "user", content: prompt }],
         max_tokens: 220,
         temperature: 0.7,
+        extra_body: { chat_template_kwargs: { enable_thinking: false } },
       }),
     });
 
