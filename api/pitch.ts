@@ -95,7 +95,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? 'Use ONLY the facts listed above. Do not mention any brand, product, partnership, sponsor, location, or named entity that is not explicitly listed in "Brand Affinities" above. Do not invent statistics, brand names, product lines, or any other specific claim not given to you.'
       : "Use ONLY the facts listed above. If no brand affinities are listed, do not name any specific brands at all — describe the creator's appeal in general terms only (audience size, engagement, content category). Do not invent statistics, brand names, product lines, or any other specific claim not given to you. Do not mention or imply any brand relationship at all.";
 
-    const prompt = `Write one tight paragraph (2–3 sentences, no bullet points, no markdown) pitching why a brand might want to work with this creator, grounded only in the following real data:\n${details.join("\n")}\n\n${brandInstruction}`;
+    const prompt = `Write one tight paragraph (2–3 sentences, no bullet points, no markdown) pitching why a brand might want to work with this creator, grounded only in the following real data:\n${details.join("\n")}\n\n${brandInstruction}\n\nRespond with ONLY valid JSON in this exact shape, no other text:\n{"pitch": "the 2-3 sentence pitch text", "brands_mentioned": ["list", "of", "brand", "names", "you", "used", "in", "the", "pitch", "if", "any"]}`;
 
     const nvidiaRes = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
       method: "POST",
@@ -125,13 +125,69 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       choices?: Array<{ message?: { content?: string } }>;
     };
 
-    const text = data?.choices?.[0]?.message?.content?.trim();
-    if (!text) {
+    const rawText = data?.choices?.[0]?.message?.content?.trim();
+    if (!rawText) {
       sendJson(res, 502, { error: "Received empty pitch response from AI model." });
       return;
     }
 
-    sendJson(res, 200, { pitch: text });
+    let cleaned = rawText;
+    if (cleaned.startsWith("```json")) {
+      cleaned = cleaned.slice(7).trim();
+    } else if (cleaned.startsWith("```")) {
+      cleaned = cleaned.slice(3).trim();
+    }
+    if (cleaned.endsWith("```")) {
+      cleaned = cleaned.slice(0, -3).trim();
+    }
+
+    let parsed: { pitch?: string; brands_mentioned?: string[] };
+    try {
+      parsed = JSON.parse(cleaned) as { pitch?: string; brands_mentioned?: string[] };
+    } catch {
+      console.warn("Failed to parse JSON response from AI model:", rawText);
+      sendJson(res, 502, { error: "Pitch generation failed verification — please try again." });
+      return;
+    }
+
+    if (!parsed.pitch || typeof parsed.pitch !== "string" || !parsed.pitch.trim()) {
+      sendJson(res, 502, { error: "Received empty pitch response from AI model." });
+      return;
+    }
+
+    const allowedBrands = new Set(
+      (payload.brand_affinity || []).map((b) => b.toLowerCase().trim())
+    );
+    const mentionedBrands = Array.isArray(parsed.brands_mentioned)
+      ? parsed.brands_mentioned
+      : [];
+
+    const hallucinated: string[] = [];
+    for (const brand of mentionedBrands) {
+      if (typeof brand === "string" && brand.trim()) {
+        const normalized = brand.toLowerCase().trim();
+        let isAllowed = allowedBrands.has(normalized);
+        if (!isAllowed) {
+          for (const allowed of allowedBrands) {
+            if (allowed.includes(normalized) || normalized.includes(allowed)) {
+              isAllowed = true;
+              break;
+            }
+          }
+        }
+        if (!isAllowed) {
+          hallucinated.push(brand);
+        }
+      }
+    }
+
+    if (hallucinated.length > 0) {
+      console.warn("Hallucinated brand names detected:", hallucinated);
+      sendJson(res, 502, { error: "Pitch generation failed verification — please try again." });
+      return;
+    }
+
+    sendJson(res, 200, { pitch: parsed.pitch.trim() });
   } catch {
     sendJson(res, 500, { error: "An unexpected error occurred while generating the pitch." });
   }
