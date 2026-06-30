@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Check, Copy, ExternalLink } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -6,13 +6,14 @@ import { Layout } from "@/components/Layout";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { AddToListButton } from "@/components/AddToListButton";
 import { ShortlistPanel } from "@/components/ShortlistPanel";
-import { GrowthChart } from "@/components/GrowthChart";
 import { SimilarCreatorsRail } from "@/components/SimilarCreatorsRail";
-import { PitchButton } from "@/components/PitchButton";
 import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
 import { formatCount, formatEngagementRate, formatPlatformLabel, formatPaidPerformance } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
 import { Skeleton } from "@/components/Skeleton";
+
+const GrowthChart = lazy(() => import("@/components/GrowthChart").then((m) => ({ default: m.GrowthChart })));
+const PitchButton = lazy(() => import("@/components/PitchButton").then((m) => ({ default: m.PitchButton })));
 
 function CopyShareButton() {
   const [copied, setCopied] = useState(false);
@@ -238,11 +239,33 @@ export function ProfileDetailPage() {
             </div>
           )}
 
-          <GrowthChart data={user.stat_history} />
+          <Suspense
+            fallback={
+              <div className="mt-8 rounded-xl bg-[var(--surface)] border border-[var(--border)] p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <Skeleton className="h-5 w-48 mb-1.5" />
+                    <Skeleton className="h-3 w-36" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-32 rounded-lg" />
+                    <Skeleton className="h-8 w-36 rounded-lg" />
+                  </div>
+                </div>
+                <div className="h-64 w-full">
+                  <Skeleton className="w-full h-full rounded-lg" />
+                </div>
+              </div>
+            }
+          >
+            <GrowthChart data={user.stat_history} />
+          </Suspense>
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <AddToListButton profile={user} platform={knownPlatform} variant="full" />
-            <PitchButton key={user.username} profile={user} platform={knownPlatform} />
+            <Suspense fallback={<Skeleton className="h-9 w-36 rounded-xl" />}>
+              <PitchButton key={user.username} profile={user} platform={knownPlatform} />
+            </Suspense>
             <CopyShareButton />
             {user.url && (
               <a
