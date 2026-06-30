@@ -49,6 +49,7 @@ Kept the visual identity intentional rather than templated:
 - **Paid-Post Performance Signal**: Visual commercial signal badge comparing paid vs. organic engagement scores.
 - **Brand Affinity Chips & Dashboard Filter**: Profile tags rendered on detail pages and a dashboard filter dropdown preloading detail data into memory.
 - **Similar Creators Rail**: Horizontally scrollable mini-cards rail at the bottom of ProfileDetailPage with engagement heat bar and navigation fallback.
+- **AI Creator Pitch Generator**: Serverless Vercel function proxying NVIDIA Nemotron LLM API (`api/pitch.ts`) with Vite dev middleware (`vite.config.ts`), local session caching, and inline error handling on `ProfileDetailPage`.
 
 ### Code quality / structure
 ```

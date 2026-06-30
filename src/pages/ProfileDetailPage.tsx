@@ -7,6 +7,7 @@ import { AddToListButton } from "@/components/AddToListButton";
 import { ShortlistPanel } from "@/components/ShortlistPanel";
 import { GrowthChart } from "@/components/GrowthChart";
 import { SimilarCreatorsRail } from "@/components/SimilarCreatorsRail";
+import { PitchButton } from "@/components/PitchButton";
 import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
 import { formatCount, formatEngagementRate, formatPlatformLabel, formatPaidPerformance } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
@@ -169,6 +170,7 @@ export function ProfileDetailPage() {
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <AddToListButton profile={user} platform={knownPlatform} variant="full" />
+            <PitchButton profile={user} platform={knownPlatform} />
             {user.url && (
               <a
                 href={user.url}
