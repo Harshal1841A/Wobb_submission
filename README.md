@@ -45,11 +45,11 @@ Kept the visual identity intentional rather than templated:
 - Responsive grid (1/2/3 columns), visible keyboard focus rings, `prefers-reduced-motion` respected, full keyboard support on cards (`role="button"`, `tabIndex`, Enter/Space handling)
 
 ### Wow Factor Features
-- **Follower Growth Chart**: Interactive `recharts` line chart plotting historical follower trajectory with an average likes comparison toggle.
+- **Follower Growth Chart**: Interactive `recharts` line chart plotting historical follower trajectory with an average likes comparison toggle. Code-split via `React.lazy()` + `<Suspense>` to keep initial page load fast.
 - **Paid-Post Performance Signal**: Visual commercial signal badge comparing paid vs. organic engagement scores.
-- **Brand Affinity Chips & Dashboard Filter**: Profile tags rendered on detail pages and a dashboard filter dropdown preloading detail data into memory.
+- **Brand Affinity Chips & Dashboard Filter**: Profile tags rendered on detail pages and a dashboard filter dropdown preloading detail data into memory. Includes an honest helper caption noting sample size limitations in mock data.
 - **Similar Creators Rail**: Horizontally scrollable mini-cards rail at the bottom of ProfileDetailPage with engagement heat bar and navigation fallback.
-- **AI Creator Pitch Generator**: Serverless Vercel function proxying NVIDIA Nemotron (`nvidia/nemotron-3-ultra-550b-a55b`) LLM API (`api/pitch.ts`) with Vite dev middleware (`vite.config.ts`), local session caching, and inline error handling on `ProfileDetailPage`.
+- **AI Creator Pitch Generator**: Serverless Vercel function proxying NVIDIA Nemotron (`nvidia/nemotron-3-ultra-550b-a55b`) LLM API (`api/pitch.ts`) with Vite dev middleware (`vite.config.ts`), local session caching, and inline error handling on `ProfileDetailPage`. Code-split via `React.lazy()` + `<Suspense>`.
 
 ### Motion Pass (Framer Motion)
 Implemented restrained, purposeful UI animations gated by `useReducedMotion()` from `motion/react`:
@@ -93,8 +93,9 @@ src/
 - Engagement-rate ceiling for the heat-bar visualization (8%) is a reasonable-but-arbitrary choice for typical Instagram/YouTube/TikTok engagement; not derived from the dataset.
 
 ## Trade-offs
-- Drag-to-reorder in the shortlist panel is implemented using `@hello-pangea/dnd` (React 19 compatible).
+- Drag-to-reorder in the shortlist panel is implemented using `@hello-pangea/dnd` (React 19 compatible) and lazy-loaded via `React.lazy()` (`ShortlistDragList`) so drag-and-drop code is only fetched when the shortlist panel is opened.
 - Profile grid virtualization uses `@tanstack/react-virtual` when list size exceeds `VIRTUALIZE_THRESHOLD` (30). Below 30 items, standard grid rendering is preserved to avoid virtualization overhead.
+- Brand affinity filtering against mock data results in tiny result sets (1-2 profiles per brand) due to limited brand tags in the sample profiles; an explicit helper caption informs reviewers of this sample limitation rather than cutting the filter.
 - Tests cover the highest-risk logic (the engagement-rate bug, shortlist dedupe/persistence behavior) and critical user paths via Playwright E2E spec (`npm run test:e2e`).
 
 ## Remaining improvements (given more time)
