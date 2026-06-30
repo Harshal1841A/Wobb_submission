@@ -71,14 +71,17 @@ export function AddToListButton({
       aria-pressed={isAdded}
       aria-label={label}
       title={label}
-      className="p-2 shrink-0 cursor-pointer transition-all border"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 shrink-0 cursor-pointer transition-all border"
       style={
         isAdded
           ? { background: "var(--accent)", color: "var(--on-accent)", borderColor: "var(--accent)" }
-          : { background: "transparent", color: "var(--text-muted)", borderColor: "var(--border)" }
+          : { background: "var(--surface-raised)", color: "var(--text)", borderColor: "var(--border)" }
       }
     >
       <AnimatedSwapIcon isAdded={isAdded} />
+      <span className="text-[11px] font-mono uppercase tracking-wider font-semibold">
+        {isAdded ? "Shortlisted" : "+ Shortlist"}
+      </span>
     </button>
   );
 }
