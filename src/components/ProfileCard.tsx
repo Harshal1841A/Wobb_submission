@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { Platform, UserProfileSummary } from "@/types";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { AddToListButton } from "./AddToListButton";
+import { Avatar } from "./Avatar";
 import { formatCount, formatEngagementRate } from "@/lib/formatters";
 
 interface ProfileCardProps {
@@ -50,12 +51,11 @@ export function ProfileCard({ profile, platform }: ProfileCardProps) {
       }}
     >
       <div className="flex items-center gap-3">
-        <img
+        <Avatar
           src={profile.picture}
+          name={profile.fullname || profile.username}
           alt={`${profile.fullname}'s profile picture`}
-          className="w-12 h-12 rounded-full object-cover shrink-0"
-          style={{ border: "1px solid var(--border-strong)" }}
-          loading="lazy"
+          className="w-12 h-12 text-sm"
         />
         <div className="text-left flex-1 min-w-0">
           <div className="flex items-center gap-1 font-semibold truncate" style={{ color: "var(--text)" }}>

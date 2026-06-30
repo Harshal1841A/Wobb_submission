@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { FullUserProfile, Platform } from "@/types";
 import { VerifiedBadge } from "./VerifiedBadge";
+import { Avatar } from "./Avatar";
 import { formatCount, formatEngagementRate } from "@/lib/formatters";
 
 interface SimilarCreatorsRailProps {
@@ -64,12 +65,11 @@ export function SimilarCreatorsRail({ similarUsers, platform }: SimilarCreatorsR
               }}
             >
               <div className="flex items-center gap-3">
-                <img
+                <Avatar
                   src={user.picture}
+                  name={user.fullname || user.username}
                   alt={`${user.fullname}'s picture`}
-                  className="w-10 h-10 rounded-full object-cover shrink-0"
-                  style={{ border: "1px solid var(--border-strong)" }}
-                  loading="lazy"
+                  className="w-10 h-10 text-xs"
                 />
                 <div className="text-left min-w-0 flex-1">
                   <div className="flex items-center gap-1 font-semibold text-sm truncate" style={{ color: "var(--text)" }}>

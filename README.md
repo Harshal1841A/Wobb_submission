@@ -42,6 +42,7 @@ Kept the visual identity intentional rather than templated:
 - Dark UI (`#0b0b10` base) with a single warm-vermilion accent (`#ff5c39`) — picked specifically to avoid the two most common "AI-generated" defaults (acid-green-on-black, cream/serif)
 - Sora (display) + Inter (body) + JetBrains Mono (for every number — followers, engagement, stats) so data reads as data
 - Signature element: an **engagement heat bar** on every card — a thin gradient bar whose width is driven directly by `engagement_rate`, so the most decision-relevant metric for a brand manager is scannable at a glance, not just printed as text
+- Resilient **Avatar System**: Built a dedicated `<Avatar />` component with `referrerPolicy="no-referrer"` for external CDNs and automatic fallback to a deterministic, name-seeded HSL gradient with creator initials when external URLs expire or fail to load.
 - Responsive grid (1/2/3 columns), visible keyboard focus rings, `prefers-reduced-motion` respected, full keyboard support on cards (`role="button"`, `tabIndex`, Enter/Space handling)
 
 ### Wow Factor Features

@@ -3,6 +3,7 @@ import { ExternalLink, GripVertical, Trash2 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { formatCount, formatPlatformLabel } from "@/lib/formatters";
+import { Avatar } from "./Avatar";
 import type { Platform, UserProfileSummary } from "@/types";
 
 export interface ShortlistEntry {
@@ -81,15 +82,11 @@ export function ShortlistDragList({
                               <GripVertical size={16} />
                             </div>
                           )}
-                          <img
+                          <Avatar
                             src={profile.picture}
+                            name={profile.fullname || profile.username}
                             alt={`${profile.fullname} avatar`}
-                            className="w-10 h-10 rounded-full object-cover shrink-0"
-                            style={{ border: "1px solid var(--border-strong)" }}
-                            loading="lazy"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = "/fallback-avatar.svg";
-                            }}
+                            className="w-10 h-10 text-xs"
                           />
                           <div className="flex-1 min-w-0">
                             <Link

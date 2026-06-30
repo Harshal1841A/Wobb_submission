@@ -7,6 +7,7 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { AddToListButton } from "@/components/AddToListButton";
 import { ShortlistPanel } from "@/components/ShortlistPanel";
 import { SimilarCreatorsRail } from "@/components/SimilarCreatorsRail";
+import { Avatar } from "@/components/Avatar";
 import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
 import { formatCount, formatEngagementRate, formatPlatformLabel, formatPaidPerformance } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
@@ -168,14 +169,18 @@ export function ProfileDetailPage() {
       </Link>
 
       <div className="flex flex-col sm:flex-row gap-6 items-start max-w-2xl">
-        <motion.img
-          src={user.picture}
-          alt={`${user.fullname}'s profile picture`}
-          className="w-24 h-24 rounded-full object-cover shrink-0 cursor-pointer"
-          style={{ border: "1px solid var(--border-strong)" }}
+        <motion.div
           whileHover={shouldReduceMotion ? {} : { scale: 1.05, rotate: 3 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-        />
+          className="shrink-0 cursor-pointer"
+        >
+          <Avatar
+            src={user.picture}
+            name={user.fullname || user.username}
+            alt={`${user.fullname}'s profile picture`}
+            className="w-24 h-24 text-2xl"
+          />
+        </motion.div>
         <div className="flex-1 text-left min-w-0">
           <h2
             className="flex items-center gap-1.5 text-xl font-bold"
