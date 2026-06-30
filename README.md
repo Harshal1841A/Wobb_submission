@@ -1,5 +1,6 @@
 # Scout — Influencer Discovery (Wobb Vibe Coder Assignment)
 
+**Live Demo:** [https://wobb-submission.vercel.app/](https://wobb-submission.vercel.app/)
 **Repository:** [https://github.com/Harshal1841A/Wobb_submission](https://github.com/Harshal1841A/Wobb_submission)
 
 Redesigned influencer search app. React 19 + TypeScript + Vite + Tailwind v4 + Zustand.
@@ -11,7 +12,7 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # production build
 npm run lint      # eslint
-npm run test      # vitest (formatters + shortlist store)
+npm run test      # vitest (formatters + shortlist store + api handlers)
 ```
 
 ## What changed
@@ -112,7 +113,7 @@ src/
 ## Remaining improvements (given more time)
 - Exporting shortlisted creators to CSV / PDF brief format for client presentation
 - Live social network API integration to replace static dataset snapshots
-- Deploy to Vercel and link the live URL here
 
-## Submission Repository
-- **GitHub:** [https://github.com/Harshal1841A/Wobb_submission](https://github.com/Harshal1841A/Wobb_submission)
+## Submission Links
+- **Live Vercel Demo:** [https://wobb-submission.vercel.app/](https://wobb-submission.vercel.app/)
+- **GitHub Repository:** [https://github.com/Harshal1841A/Wobb_submission](https://github.com/Harshal1841A/Wobb_submission)
