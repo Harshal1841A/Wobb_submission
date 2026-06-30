@@ -148,7 +148,7 @@ export function ProfileDetailPage() {
   if (!profileData) {
     return (
       <Layout title={`@${username}`}>
-        <EmptyState message={`Could not load profile details for @${username}`} />
+        <MissingProfileState username={username} />
       </Layout>
     );
   }
@@ -297,6 +297,83 @@ function EmptyState({ message }: { message: string }) {
     <div className="flex flex-col items-center gap-3 py-20 text-center">
       <p style={{ color: "var(--danger)" }}>{message}</p>
       <Link to="/" className="text-sm hover:underline" style={{ color: "var(--accent)" }}>
+        Back to search
+      </Link>
+    </div>
+  );
+}
+
+const AVAILABLE_SAMPLE_PROFILES = [
+  { username: "cristiano", fullname: "Cristiano Ronaldo", platform: "instagram" },
+  { username: "mrbeast", fullname: "MrBeast", platform: "tiktok" },
+  { username: "khaby.lame", fullname: "Khabane Lame", platform: "tiktok" },
+  { username: "instagram", fullname: "Instagram", platform: "instagram" },
+  { username: "MrBeast6000", fullname: "MrBeast", platform: "youtube" },
+  { username: "tseries", fullname: "T-Series", platform: "youtube" },
+];
+
+function MissingProfileState({ username }: { username: string }) {
+  return (
+    <div className="flex flex-col items-center max-w-lg mx-auto py-12 text-center">
+      <div
+        className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-xl font-bold"
+        style={{ background: "var(--surface-raised)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
+      >
+        @
+      </div>
+      <h2
+        className="text-xl font-bold mb-2"
+        style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}
+      >
+        @{username}
+      </h2>
+      <p className="text-sm mb-8 leading-relaxed" style={{ color: "var(--text-muted)" }}>
+        Detailed profile analytics for <span className="font-semibold" style={{ color: "var(--text)" }}>@{username}</span> are not included in this static demonstration dataset. Only spotlight creators have full historical data and AI pitching enabled.
+      </p>
+
+      <div
+        className="w-full text-left rounded-2xl p-5 mb-8"
+        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      >
+        <div
+          className="text-xs font-semibold uppercase tracking-wider mb-3"
+          style={{ color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}
+        >
+          Explore Available Sample Profiles
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {AVAILABLE_SAMPLE_PROFILES.map((p) => (
+            <Link
+              key={p.username}
+              to={`/profile/${p.username}?platform=${p.platform}`}
+              className="flex items-center justify-between p-2.5 rounded-xl transition-colors hover:border-[var(--border-strong)]"
+              style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
+            >
+              <div className="min-w-0 pr-2">
+                <div className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>
+                  @{p.username}
+                </div>
+                <div className="text-xs truncate" style={{ color: "var(--text-faint)" }}>
+                  {p.fullname}
+                </div>
+              </div>
+              <span
+                className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}
+              >
+                {p.platform}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors hover:border-[var(--border-strong)]"
+        style={{ background: "var(--surface-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
+      >
+        <ArrowLeft size={15} aria-hidden="true" />
         Back to search
       </Link>
     </div>
