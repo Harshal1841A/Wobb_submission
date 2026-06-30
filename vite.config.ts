@@ -1,7 +1,7 @@
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import handler from "./api/pitch";
 
 function pitchApiPlugin(): Plugin {
@@ -13,6 +13,11 @@ function pitchApiPlugin(): Plugin {
       });
     },
   };
+}
+
+const env = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "");
+if (env.NVIDIA_API_KEY) {
+  process.env.NVIDIA_API_KEY = env.NVIDIA_API_KEY;
 }
 
 // https://vite.dev/config/
