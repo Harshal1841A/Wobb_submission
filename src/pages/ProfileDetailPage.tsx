@@ -91,6 +91,7 @@ export function ProfileDetailPage() {
 
   useEffect(() => {
     if (!username) return;
+    window.scrollTo?.(0, 0);
     let active = true;
     loadProfileByUsername(username).then((data) => {
       if (!active) return; // ignore stale response if username changed mid-flight

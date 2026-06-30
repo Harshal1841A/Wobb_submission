@@ -26,6 +26,10 @@ npm run test      # vitest (formatters + shortlist store)
 - **Recomputing the full search dataset on every render** (`extractProfiles` ran on each keystroke/re-render with no memoization). Wrapped in `useMemo` via a new `useProfileSearch` hook.
 - **`react-beautiful-dnd` dependency** in `package.json` was incompatible with React 19 and failed to install. It wasn't used anywhere in the app — removed.
 
+- **AI Pitch Hallucination & Resiliency.** Confirmed that the LLM occasionally fabricated non-existent brand sponsorships (e.g., Clear Men, Binance) not present in source profile data. Added server-side output validation (`api/pitch.ts`) that verifies every mentioned brand against the profile's actual `brand_affinity` list, plus 3-attempt exponential backoff retries for transient rate-limit errors (`429`/`503`).
+- **Broken External Profile Images.** Several static image URLs in creator datasets returned `403 Forbidden` or `404 Not Found`. Upgraded `<Avatar />` with a multi-tier fallback: direct URL → `unavatar.io` proxy → deterministic HSL initials avatar.
+- **Route Navigation Scroll Position.** Navigating between creator profiles via the Similar Creators rail kept the viewport scrolled down. Added automatic scroll-to-top on route transition.
+
 ### State management — Zustand
 There was no `Context` actually wired up in the starter code yet (the task description anticipates you'd reach for it for the shortlist feature). Built the shortlist directly in Zustand instead: `src/store/shortlistStore.ts`, with the `persist` middleware backing onto `localStorage` so the list survives a page refresh.
 
@@ -35,6 +39,7 @@ Fully implemented (`src/store/shortlistStore.ts` + `src/components/AddToListButt
 - Duplicate-proof: keyed by `platform:user_id`, so adding the same profile twice is a no-op
 - A profile with the same `user_id` on two different platforms is treated as two distinct entries (deliberate — they're different accounts)
 - Persistent shortlist rail (slide-over panel), opened from the header on every page, showing avatar, handle, platform, follower count, with quick remove and an external link
+- Interactive sorting & filtering: filter shortlisted creators by platform or sort by follower count / recent additions
 - Survives page refresh via `zustand/persist` → `localStorage`
 
 ### Redesign
@@ -100,6 +105,6 @@ src/
 - Tests cover the highest-risk logic (the engagement-rate bug, shortlist dedupe/persistence behavior) and critical user paths via Playwright E2E spec (`npm run test:e2e`).
 
 ## Remaining improvements (given more time)
-- Sort/filter the shortlist panel (e.g. by platform, by follower count)
-- Empty/error states for the rare case a profile JSON is missing (currently shown, but could offer a retry)
+- Exporting shortlisted creators to CSV / PDF brief format for client presentation
+- Live social network API integration to replace static dataset snapshots
 - Deploy to Vercel and link the live URL here
