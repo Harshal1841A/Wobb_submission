@@ -8,7 +8,9 @@ import {
   CartesianGrid,
   Tooltip
 } from 'recharts';
+import { motion, useReducedMotion } from 'motion/react';
 import { formatCount, formatMonthLabel } from '@/lib/formatters';
+import { Skeleton } from '@/components/Skeleton';
 
 interface StatHistoryPoint {
   month: string;
@@ -19,10 +21,35 @@ interface StatHistoryPoint {
 
 interface GrowthChartProps {
   data?: StatHistoryPoint[];
+  isLoading?: boolean;
 }
 
-export const GrowthChart: React.FC<GrowthChartProps> = ({ data }) => {
+type Timeframe = '30d' | '90d' | '1yr' | 'all';
+
+export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => {
   const [showAvgLikes, setShowAvgLikes] = useState(false);
+  const [timeframe, setTimeframe] = useState<Timeframe>('all');
+  const shouldReduceMotion = useReducedMotion();
+
+  if (isLoading) {
+    return (
+      <div className="mt-8 rounded-xl bg-[var(--surface)] border border-[var(--border)] p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <Skeleton className="h-5 w-48 mb-1.5" />
+            <Skeleton className="h-3 w-36" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-32 rounded-lg" />
+            <Skeleton className="h-8 w-36 rounded-lg" />
+          </div>
+        </div>
+        <div className="h-64 w-full">
+          <Skeleton className="w-full h-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
 
   if (!data || data.length < 2) {
     return (
@@ -32,7 +59,22 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data }) => {
     );
   }
 
-  const chartData = data.map((pt) => ({
+  const getFilteredData = () => {
+    switch (timeframe) {
+      case '30d':
+        return data.slice(-2);
+      case '90d':
+        return data.slice(-4);
+      case '1yr':
+        return data.slice(-12);
+      case 'all':
+      default:
+        return data;
+    }
+  };
+
+  const filtered = getFilteredData();
+  const chartData = filtered.map((pt) => ({
     ...pt,
     formattedMonth: formatMonthLabel(pt.month),
   }));
@@ -50,20 +92,42 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data }) => {
             Historical trajectory over time
           </p>
         </div>
-        {hasAvgLikes && (
-          <label className="flex items-center gap-2 text-xs font-medium text-[var(--text-muted)] cursor-pointer select-none bg-[var(--surface-raised)] border border-[var(--border)] px-3 py-1.5 rounded-lg hover:border-[var(--border-strong)] transition-colors">
-            <input
-              type="checkbox"
-              checked={showAvgLikes}
-              onChange={(e) => setShowAvgLikes(e.target.checked)}
-              className="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)] bg-[var(--bg)]"
-            />
-            <span>Compare Avg Likes</span>
-          </label>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center rounded-lg bg-[var(--surface-raised)] border border-[var(--border)] p-0.5">
+            {(['30d', '90d', '1yr', 'all'] as const).map((tf) => (
+              <button
+                key={tf}
+                onClick={() => setTimeframe(tf)}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                  timeframe === tf
+                    ? 'bg-[var(--accent)] text-[#0b0b10]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                }`}
+              >
+                {tf === 'all' ? 'All' : tf}
+              </button>
+            ))}
+          </div>
+
+          {hasAvgLikes && (
+            <label className="flex items-center gap-2 text-xs font-medium text-[var(--text-muted)] cursor-pointer select-none bg-[var(--surface-raised)] border border-[var(--border)] px-3 py-1.5 rounded-lg hover:border-[var(--border-strong)] transition-colors">
+              <input
+                type="checkbox"
+                checked={showAvgLikes}
+                onChange={(e) => setShowAvgLikes(e.target.checked)}
+                className="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)] bg-[var(--bg)]"
+              />
+              <span>Compare Avg Likes</span>
+            </label>
+          )}
+        </div>
       </div>
 
-      <div className="h-64 w-full">
+      <motion.div
+        layout
+        transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: 'easeInOut' }}
+        className="h-64 w-full"
+      >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
             <CartesianGrid stroke="#26252f" strokeDasharray="3 3" vertical={false} />
@@ -108,6 +172,9 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data }) => {
               labelStyle={{ color: '#8b8997', fontWeight: 600, marginBottom: '0.25rem' }}
             />
             <Line
+              isAnimationActive={!shouldReduceMotion}
+              animationDuration={300}
+              animationEasing="ease-in-out"
               yAxisId="left"
               type="monotone"
               dataKey="followers"
@@ -119,6 +186,9 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data }) => {
             />
             {showAvgLikes && (
               <Line
+                isAnimationActive={!shouldReduceMotion}
+                animationDuration={300}
+                animationEasing="ease-in-out"
                 yAxisId="right"
                 type="monotone"
                 dataKey="avg_likes"
@@ -132,7 +202,7 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data }) => {
             )}
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </motion.div>
     </div>
   );
 };

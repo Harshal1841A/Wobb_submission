@@ -21,5 +21,14 @@ describe("GrowthChart", () => {
 
     fireEvent.click(checkbox);
     expect(checkbox.checked).toBe(true);
+
+    const btn30d = screen.getByText("30d");
+    expect(btn30d).toBeDefined();
+    fireEvent.click(btn30d);
+  });
+
+  it("renders skeleton layout when isLoading is true", () => {
+    render(<GrowthChart isLoading={true} />);
+    expect(screen.getAllByTestId("skeleton").length).toBeGreaterThan(0);
   });
 });

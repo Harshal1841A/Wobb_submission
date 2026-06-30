@@ -11,6 +11,7 @@ import { PitchButton } from "@/components/PitchButton";
 import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
 import { formatCount, formatEngagementRate, formatPlatformLabel, formatPaidPerformance } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
+import { Skeleton } from "@/components/Skeleton";
 
 interface StatProps {
   label: string;
@@ -62,13 +63,32 @@ export function ProfileDetailPage() {
   if (!loaded) {
     return (
       <Layout title={`@${username}`}>
-        <div className="flex items-center justify-center py-24">
-          <div
-            className="w-6 h-6 rounded-full border-2 animate-spin"
-            style={{ borderColor: "var(--border-strong)", borderTopColor: "var(--accent)" }}
-            role="status"
-            aria-label="Loading profile"
-          />
+        <div role="status" aria-label="Loading profile">
+          <div className="inline-flex items-center gap-1.5 text-sm mb-6 opacity-40">
+            <ArrowLeft size={15} aria-hidden="true" />
+            <span>Back to search</span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-6 items-start max-w-2xl">
+            <Skeleton className="w-24 h-24 rounded-full shrink-0" />
+            <div className="flex-1 text-left min-w-0 w-full">
+              <Skeleton className="h-7 w-48 mb-2" />
+              <Skeleton className="h-4 w-32 mb-2" />
+              <Skeleton className="h-3 w-24 mb-4" />
+              <Skeleton className="h-16 w-full mb-4" />
+
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="p-3 rounded-xl bg-[var(--surface-raised)] border border-[var(--border)]">
+                    <Skeleton className="h-3 w-16 mb-2" />
+                    <Skeleton className="h-5 w-24" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <GrowthChart isLoading={true} />
         </div>
       </Layout>
     );

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { FullUserProfile, Platform } from "@/types";
 import { formatPlatformLabel } from "@/lib/formatters";
 import { pitchCache } from "@/utils/pitchCache";
+import { Skeleton } from "@/components/Skeleton";
 
 interface PitchButtonProps {
   profile: FullUserProfile;
@@ -17,6 +19,7 @@ interface PitchState {
 }
 
 export function PitchButton({ profile, platform }: PitchButtonProps) {
+  const shouldReduceMotion = useReducedMotion();
   const [state, setState] = useState<PitchState>(() => ({
     username: profile.username,
     loading: false,
@@ -104,51 +107,85 @@ export function PitchButton({ profile, platform }: PitchButtonProps) {
         Generate pitch
       </button>
 
-      {loading && (
-        <div
-          className="w-full mt-2 p-4 rounded-2xl flex items-center gap-3"
-          style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
-        >
-          <div
-            className="w-5 h-5 rounded-full border-2 animate-spin shrink-0"
-            style={{ borderColor: "var(--border-strong)", borderTopColor: "var(--accent)" }}
-            role="status"
-            aria-label="Generating pitch"
-          />
-          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-            Generating pitch for @{profile.username}...
-          </span>
-        </div>
-      )}
-
-      {!loading && pitch && (
-        <div
-          className="w-full mt-2 p-4 rounded-2xl"
-          style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
-        >
-          <div
-            className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2"
-            style={{ color: "var(--accent)" }}
+      <AnimatePresence mode="wait">
+        {loading && (
+          <motion.div
+            key="skeleton"
+            initial={shouldReduceMotion ? { opacity: 1 } : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.22, ease: "easeInOut" }}
+            className="w-full overflow-hidden"
           >
-            <Sparkles size={14} />
-            AI Creator Pitch
-          </div>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>
-            {pitch}
-          </p>
-        </div>
-      )}
+            <div
+              className="mt-2 p-4 rounded-2xl"
+              style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
+              role="status"
+              aria-label="Generating pitch"
+            >
+              <div
+                className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-3"
+                style={{ color: "var(--accent)" }}
+              >
+                <Sparkles size={14} />
+                <span>Generating pitch for @{profile.username}...</span>
+              </div>
+              <div className="space-y-2.5">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-[90%]" />
+                <Skeleton className="h-4 w-[75%]" />
+              </div>
+            </div>
+          </motion.div>
+        )}
 
-      {!loading && error && (
-        <div
-          className="w-full mt-2 p-4 rounded-2xl"
-          style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
-        >
-          <p className="text-sm" style={{ color: "var(--danger)" }}>
-            {error}
-          </p>
-        </div>
-      )}
+        {!loading && pitch && (
+          <motion.div
+            key="pitch"
+            initial={shouldReduceMotion ? { opacity: 1 } : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.22, ease: "easeInOut" }}
+            className="w-full overflow-hidden"
+          >
+            <div
+              className="mt-2 p-4 rounded-2xl"
+              style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
+            >
+              <div
+                className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2"
+                style={{ color: "var(--accent)" }}
+              >
+                <Sparkles size={14} />
+                AI Creator Pitch
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>
+                {pitch}
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {!loading && error && (
+          <motion.div
+            key="error"
+            initial={shouldReduceMotion ? { opacity: 1 } : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.22, ease: "easeInOut" }}
+            className="w-full overflow-hidden"
+          >
+            <div
+              className="mt-2 p-4 rounded-2xl"
+              style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
+            >
+              <p className="text-sm" style={{ color: "var(--danger)" }}>
+                {error}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
