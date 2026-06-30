@@ -57,15 +57,33 @@ async function getBody(req: VercelRequest): Promise<PitchRequestPayload | null> 
   });
 }
 
+function generateFallbackPitch(payload: PitchRequestPayload): string {
+  const name = payload.fullname || payload.username || "This creator";
+  const platform = payload.platform ? `${payload.platform} ` : "";
+  const followersCount = payload.followers !== undefined ? payload.followers : 0;
+  let followersStr = "";
+  if (followersCount >= 1_000_000) {
+    followersStr = `${(followersCount / 1_000_000).toFixed(1)}M`;
+  } else if (followersCount >= 1_000) {
+    followersStr = `${(followersCount / 1_000).toFixed(0)}K`;
+  } else if (followersCount > 0) {
+    followersStr = `${followersCount}`;
+  }
+
+  const audienceText = followersStr ? `a dedicated ${platform}audience of ${followersStr} followers` : `a strong ${platform}community`;
+  const rateText = payload.engagement_rate !== undefined ? ` maintaining an exceptional ${(payload.engagement_rate * 100).toFixed(2)}% engagement rate` : "";
+  
+  const brands = payload.brand_affinity && payload.brand_affinity.length > 0 ? payload.brand_affinity : [];
+  const brandText = brands.length > 0
+    ? ` With demonstrated affinity for ${brands.slice(0, 3).join(", ")}, partnering with ${name} provides seamless brand alignment and high-conversion visibility.`
+    : ` With robust reach and consistent community interaction, partnering with ${name} delivers authentic campaign visibility and measurable impact.`;
+
+  return `${name} commands ${audienceText}${rateText}.${brandText}`;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
     sendJson(res, 405, { error: "Method not allowed" });
-    return;
-  }
-
-  const apiKey = process.env.NVIDIA_API_KEY;
-  if (!apiKey) {
-    sendJson(res, 503, { error: "NVIDIA_API_KEY is not configured on the server." });
     return;
   }
 
@@ -73,6 +91,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const payload = await getBody(req);
     if (!payload || typeof payload !== "object") {
       sendJson(res, 400, { error: "Invalid request body" });
+      return;
+    }
+
+    const apiKey = process.env.NVIDIA_API_KEY;
+    if (!apiKey) {
+      sendJson(res, 200, { pitch: generateFallbackPitch(payload) });
       return;
     }
 
@@ -114,31 +138,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             chat_template_kwargs: { enable_thinking: false },
           }),
         });
-
-        if (nvidiaRes.ok) {
-          break;
-        }
-        // Retry on transient server overload or rate limits
-        if ([429, 500, 502, 503, 504].includes(nvidiaRes.status) && attempt < 3) {
-          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+        if (nvidiaRes.ok) break;
+        if (nvidiaRes.status === 429) {
+          const retryAfter = nvidiaRes.headers.get("retry-after");
+          const waitMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : 1000 * Math.pow(2, attempt);
+          await new Promise((r) => setTimeout(r, Math.min(waitMs, 3000)));
           continue;
         }
         break;
       } catch (err) {
-        if (attempt < 3) {
-          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
-          continue;
+        if (attempt === 3) {
+          sendJson(res, 200, { pitch: generateFallbackPitch(payload) });
+          return;
         }
-        throw err;
       }
     }
 
     if (!nvidiaRes || !nvidiaRes.ok) {
-      if (nvidiaRes?.status === 429) {
-        sendJson(res, 429, { error: "Rate limit exceeded. Please try again in a moment." });
-        return;
-      }
-      sendJson(res, 502, { error: `NVIDIA API request failed (${nvidiaRes?.status || "Network Error"})` });
+      sendJson(res, 200, { pitch: generateFallbackPitch(payload) });
       return;
     }
 
