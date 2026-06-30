@@ -242,7 +242,7 @@ export function ProfileDetailPage() {
 
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <AddToListButton profile={user} platform={knownPlatform} variant="full" />
-            <PitchButton profile={user} platform={knownPlatform} />
+            <PitchButton key={user.username} profile={user} platform={knownPlatform} />
             <CopyShareButton />
             {user.url && (
               <a
