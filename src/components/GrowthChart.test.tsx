@@ -22,9 +22,9 @@ describe("GrowthChart", () => {
     fireEvent.click(checkbox);
     expect(checkbox.checked).toBe(true);
 
-    const btn30d = screen.getByText("30d");
-    expect(btn30d).toBeDefined();
-    fireEvent.click(btn30d);
+    const btnRecent = screen.getByText("Last 2mo");
+    expect(btnRecent).toBeDefined();
+    fireEvent.click(btnRecent);
   });
 
   it("renders skeleton layout when isLoading is true", () => {

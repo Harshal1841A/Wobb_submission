@@ -24,7 +24,14 @@ interface GrowthChartProps {
   isLoading?: boolean;
 }
 
-type Timeframe = '30d' | '90d' | '1yr' | 'all';
+type Timeframe = 'recent' | 'half' | 'year' | 'all';
+
+const TIMEFRAME_OPTIONS: { id: Timeframe; label: string }[] = [
+  { id: 'recent', label: 'Last 2mo' },
+  { id: 'half', label: 'Last 4mo' },
+  { id: 'year', label: 'Last year' },
+  { id: 'all', label: 'All' },
+];
 
 export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => {
   const [showAvgLikes, setShowAvgLikes] = useState(false);
@@ -61,11 +68,11 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
 
   const getFilteredData = () => {
     switch (timeframe) {
-      case '30d':
+      case 'recent':
         return data.slice(-2);
-      case '90d':
+      case 'half':
         return data.slice(-4);
-      case '1yr':
+      case 'year':
         return data.slice(-12);
       case 'all':
       default:
@@ -94,17 +101,17 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center rounded-lg bg-[var(--surface-raised)] border border-[var(--border)] p-0.5">
-            {(['30d', '90d', '1yr', 'all'] as const).map((tf) => (
+            {TIMEFRAME_OPTIONS.map(({ id, label }) => (
               <button
-                key={tf}
-                onClick={() => setTimeframe(tf)}
+                key={id}
+                onClick={() => setTimeframe(id)}
                 className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
-                  timeframe === tf
+                  timeframe === id
                     ? 'bg-[var(--accent)] text-[#0b0b10]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text)]'
                 }`}
               >
-                {tf === 'all' ? 'All' : tf}
+                {label}
               </button>
             ))}
           </div>
