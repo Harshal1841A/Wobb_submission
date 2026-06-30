@@ -83,14 +83,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       `Followers: ${payload.followers !== undefined ? payload.followers : "N/A"}`,
       `Engagement Rate: ${payload.engagement_rate !== undefined ? `${(payload.engagement_rate * 100).toFixed(2)}%` : "N/A"}`
     ];
-    if (payload.brand_affinity && payload.brand_affinity.length > 0) {
-      details.push(`Brand Affinities: ${payload.brand_affinity.join(", ")}`);
+    const hasBrands = Boolean(payload.brand_affinity && payload.brand_affinity.length > 0);
+    if (hasBrands) {
+      details.push(`Brand Affinities: ${payload.brand_affinity!.join(", ")}`);
     }
     if (payload.top_hashtags && payload.top_hashtags.length > 0) {
       details.push(`Top Hashtags: ${payload.top_hashtags.join(", ")}`);
     }
 
-    const prompt = `Write one tight paragraph (2–3 sentences, no bullet points, no markdown) pitching why a brand might want to work with this creator, grounded only in the following real data:\n${details.join("\n")}\n\nDo not invent any statistics not given to you.`;
+    const brandInstruction = hasBrands
+      ? 'Use ONLY the facts listed above. Do not mention any brand, product, partnership, sponsor, location, or named entity that is not explicitly listed in "Brand Affinities" above. Do not invent statistics, brand names, product lines, or any other specific claim not given to you.'
+      : "Use ONLY the facts listed above. If no brand affinities are listed, do not name any specific brands at all — describe the creator's appeal in general terms only (audience size, engagement, content category). Do not invent statistics, brand names, product lines, or any other specific claim not given to you. Do not mention or imply any brand relationship at all.";
+
+    const prompt = `Write one tight paragraph (2–3 sentences, no bullet points, no markdown) pitching why a brand might want to work with this creator, grounded only in the following real data:\n${details.join("\n")}\n\n${brandInstruction}`;
 
     const nvidiaRes = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
       method: "POST",
