@@ -97,27 +97,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const prompt = `Write one tight paragraph (2–3 sentences, no bullet points, no markdown) pitching why a brand might want to work with this creator, grounded only in the following real data:\n${details.join("\n")}\n\n${brandInstruction}\n\nRespond with ONLY valid JSON in this exact shape, no other text:\n{"pitch": "the 2-3 sentence pitch text", "brands_mentioned": ["list", "of", "brand", "names", "you", "used", "in", "the", "pitch", "if", "any"]}`;
 
-    const nvidiaRes = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "nvidia/nemotron-3-ultra-550b-a55b",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 220,
-        temperature: 0.7,
-        chat_template_kwargs: { enable_thinking: false },
-      }),
-    });
+    let nvidiaRes: Response | null = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        nvidiaRes = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: "nvidia/nemotron-3-ultra-550b-a55b",
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: 220,
+            temperature: 0.7,
+            chat_template_kwargs: { enable_thinking: false },
+          }),
+        });
 
-    if (!nvidiaRes.ok) {
-      if (nvidiaRes.status === 429) {
+        if (nvidiaRes.ok) {
+          break;
+        }
+        // Retry on transient server overload or rate limits
+        if ([429, 500, 502, 503, 504].includes(nvidiaRes.status) && attempt < 3) {
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+          continue;
+        }
+        break;
+      } catch (err) {
+        if (attempt < 3) {
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (!nvidiaRes || !nvidiaRes.ok) {
+      if (nvidiaRes?.status === 429) {
         sendJson(res, 429, { error: "Rate limit exceeded. Please try again in a moment." });
         return;
       }
-      sendJson(res, 502, { error: `NVIDIA API request failed (${nvidiaRes.status})` });
+      sendJson(res, 502, { error: `NVIDIA API request failed (${nvidiaRes?.status || "Network Error"})` });
       return;
     }
 
