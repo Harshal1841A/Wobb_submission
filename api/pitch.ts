@@ -103,7 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         messages: [{ role: "user", content: prompt }],
         max_tokens: 220,
         temperature: 0.7,
-        extra_body: { chat_template_kwargs: { enable_thinking: false } },
+        chat_template_kwargs: { enable_thinking: false },
       }),
     });
 
