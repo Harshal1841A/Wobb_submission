@@ -162,6 +162,12 @@ export function PitchButton({ profile, platform }: PitchButtonProps) {
               <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>
                 {pitch}
               </p>
+              <p
+                className="text-[11px] mt-2.5 pt-2 border-t"
+                style={{ color: "var(--text-faint)", borderColor: "var(--border)" }}
+              >
+                AI-generated based on available profile data — verify before using externally.
+              </p>
             </div>
           </motion.div>
         )}
