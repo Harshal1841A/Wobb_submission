@@ -1,5 +1,5 @@
 import { useState, useMemo, Suspense, lazy } from "react";
-import { X } from "lucide-react";
+import { X, Trophy } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { useShortlistStore } from "@/store/shortlistStore";
 import { formatPlatformLabel } from "@/lib/formatters";
@@ -7,6 +7,7 @@ import type { Platform } from "@/types";
 import { PLATFORMS } from "@/utils/dataHelpers";
 
 const ShortlistDragList = lazy(() => import("./ShortlistDragList").then((m) => ({ default: m.ShortlistDragList })));
+const CreatorCompareModal = lazy(() => import("./CreatorCompareModal").then((m) => ({ default: m.CreatorCompareModal })));
 
 interface ShortlistPanelProps {
   open: boolean;
@@ -22,6 +23,7 @@ export function ShortlistPanel({ open, onClose }: ShortlistPanelProps) {
 
   const [platformFilter, setPlatformFilter] = useState<"all" | Platform>("all");
   const [sortBy, setSortBy] = useState<"recent" | "followers">("recent");
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const isFilterActive = platformFilter !== "all" || sortBy !== "recent";
 
@@ -213,7 +215,22 @@ export function ShortlistPanel({ open, onClose }: ShortlistPanelProps) {
             </div>
 
             {entries.length > 0 && (
-              <div className="p-4 border-t shrink-0" style={{ borderColor: "var(--border)" }}>
+              <div className="p-4 border-t flex flex-col gap-2.5 shrink-0" style={{ borderColor: "var(--border)" }}>
+                {derivedEntries.length >= 2 && (
+                  <button
+                    type="button"
+                    onClick={() => setCompareOpen(true)}
+                    className="w-full py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-widest cursor-pointer transition-all flex items-center justify-center gap-2 shadow-sm"
+                    style={{
+                      background: "var(--text)",
+                      color: "var(--surface)",
+                      border: "1px solid var(--text)",
+                    }}
+                  >
+                    <Trophy size={15} />
+                    <span>Compare Top ({Math.min(derivedEntries.length, 4)}) Head-to-Head</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={clear}
@@ -231,6 +248,13 @@ export function ShortlistPanel({ open, onClose }: ShortlistPanelProps) {
           </motion.aside>
         </>
       )}
+      <Suspense fallback={null}>
+        <CreatorCompareModal
+          open={compareOpen}
+          onClose={() => setCompareOpen(false)}
+          entries={derivedEntries.slice(0, 4)}
+        />
+      </Suspense>
     </AnimatePresence>
   );
 }

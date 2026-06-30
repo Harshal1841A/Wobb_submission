@@ -1,5 +1,7 @@
 # Scout — Influencer Discovery (Wobb Vibe Coder Assignment)
 
+**Repository:** [https://github.com/Harshal1841A/Wobb_submission](https://github.com/Harshal1841A/Wobb_submission)
+
 Redesigned influencer search app. React 19 + TypeScript + Vite + Tailwind v4 + Zustand.
 
 ## Running it
@@ -27,7 +29,9 @@ npm run test      # vitest (formatters + shortlist store)
 - **`react-beautiful-dnd` dependency** in `package.json` was incompatible with React 19 and failed to install. It wasn't used anywhere in the app — removed.
 
 - **AI Pitch Hallucination & Resiliency.** Confirmed that the LLM occasionally fabricated non-existent brand sponsorships (e.g., Clear Men, Binance) not present in source profile data. Added server-side output validation (`api/pitch.ts`) that verifies every mentioned brand against the profile's actual `brand_affinity` list, plus 3-attempt exponential backoff retries for transient rate-limit errors (`429`/`503`).
-- **Broken External Profile Images.** Several static image URLs in creator datasets returned `403 Forbidden` or `404 Not Found`. Upgraded `<Avatar />` with a multi-tier fallback: direct URL → `unavatar.io` proxy → deterministic HSL initials avatar.
+- **Broken & Out-of-Sync External Profile Images.** Several static image URLs across creator datasets returned `403 Forbidden` or `404 Not Found`, and individual creator profile dossiers (`src/assets/data/profiles/*.json`) contained stale CDN URLs that diverged from the verified search index (`src/assets/data/search/*.json`). Audited and synchronized all profile data files to working CDN URLs, and upgraded `<Avatar />` with a multi-tier fallback: direct URL → `unavatar.io` proxy → deterministic HSL initials avatar.
+- **Misattributed Profile Picture Data.** Found that `src/assets/data/profiles/mrbeast.json` contained Charli D'Amelio's profile picture URL, corrupting MrBeast's avatar when viewing his detail dossier directly. Replaced with MrBeast's authentic picture URL from the verified search index.
+- **Platform Parameter Routing & Fallback Failure.** Visiting `/profile/:username` directly without a `?platform=` query parameter caused `platform` to evaluate to `"unknown"`, displaying `"Unknown platform"` and silently defaulting actions (Shortlisting, AI Pitching, Similar Creators) to Instagram even for TikTok and YouTube creators. Upgraded `ProfileDetailPage` to inspect `user.type` to correctly derive the platform.
 - **Route Navigation Scroll Position.** Navigating between creator profiles via the Similar Creators rail kept the viewport scrolled down. Added automatic scroll-to-top on route transition.
 
 ### State management — Zustand
@@ -102,9 +106,13 @@ src/
 - Drag-to-reorder in the shortlist panel is implemented using `@hello-pangea/dnd` (React 19 compatible) and lazy-loaded via `React.lazy()` (`ShortlistDragList`) so drag-and-drop code is only fetched when the shortlist panel is opened.
 - Profile grid virtualization uses `@tanstack/react-virtual` when list size exceeds `VIRTUALIZE_THRESHOLD` (30). Below 30 items, standard grid rendering is preserved to avoid virtualization overhead.
 - Removed a dashboard-level brand affinity filter dropdown: sample data only covers brand affinities for a handful of profiles, making a full-dataset dashboard filter confusing (most brand selections returned 1-2 results). Cut per the brief's preference for judgment over feature count. Detail-page brand affinity chips remain unaffected.
-- Tests cover the highest-risk logic (the engagement-rate bug, shortlist dedupe/persistence behavior) and critical user paths via Playwright E2E spec (`npm run test:e2e`).
+- Head-to-Head Creator Comparison (`CreatorCompareModal`): Added a 4-way side-by-side comparison modal directly accessible from the Dossier shortlist panel when 2 or more creators are selected. Automatically highlights the category winner (`BEST` tag) across followers, engagement rate, average views, and paid performance.
+- Tests cover the highest-risk logic (the engagement-rate bug, shortlist dedupe/persistence behavior, AI pitch hallucination rejection, and modal comparison engine) with 100% passing unit tests (42/42 tests passing across 10 test suites) and critical user paths via Playwright E2E spec (`npm run test:e2e`).
 
 ## Remaining improvements (given more time)
 - Exporting shortlisted creators to CSV / PDF brief format for client presentation
 - Live social network API integration to replace static dataset snapshots
 - Deploy to Vercel and link the live URL here
+
+## Submission Repository
+- **GitHub:** [https://github.com/Harshal1841A/Wobb_submission](https://github.com/Harshal1841A/Wobb_submission)

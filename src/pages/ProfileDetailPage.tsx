@@ -156,7 +156,10 @@ export function ProfileDetailPage() {
   }
 
   const user: FullUserProfile = profileData.data.user_profile;
-  const knownPlatform: Platform = platform === "unknown" ? "instagram" : platform;
+  const knownPlatform: Platform =
+    platform !== "unknown"
+      ? platform
+      : (user.type as Platform) || "instagram";
 
   return (
     <Layout title={user.fullname} onOpenShortlist={() => setShortlistOpen(true)}>
@@ -192,7 +195,7 @@ export function ProfileDetailPage() {
           </h2>
           <p style={{ color: "var(--text-muted)" }}>{user.fullname}</p>
           <p className="text-xs mt-1" style={{ color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>
-            {formatPlatformLabel(platform === "unknown" ? "" : platform) || "Unknown platform"}
+            {formatPlatformLabel(knownPlatform)}
           </p>
 
           {user.description && (
