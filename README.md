@@ -84,6 +84,7 @@ src/
 - Search input debounced (150ms) before filtering, so typing doesn't re-filter the full list on every keystroke
 - `AddToListButton` is one shared component used by both the card and the detail page, instead of two separate stub implementations
 - Race condition guard in `ProfileDetailPage`: if you navigate between two profiles quickly, a stale fetch response can no longer overwrite the newer one
+- **Strict Linter Audit & Effect Scheduling**: Passes `npm run lint` with 0 errors and 0 warnings. Synchronous state updates inside effect bodies (`react-hooks/set-state-in-effect`) are strictly prevented via `queueMicrotask` scheduling.
 
 ## Libraries added
 - `motion` (`motion/react`) — Framer Motion for high-performance, accessible UI micro-interactions
