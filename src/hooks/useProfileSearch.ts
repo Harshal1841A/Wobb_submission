@@ -9,21 +9,12 @@ import { extractProfiles, filterProfiles } from "@/utils/dataHelpers";
  */
 export function useProfileSearch(
   platform: Platform,
-  query: string,
-  selectedBrand: string = "All",
-  brandAffinityMap: Record<string, string[]> = {}
+  query: string
 ) {
   const allProfiles = useMemo(() => extractProfiles(platform), [platform]);
   const filtered = useMemo(() => {
-    let list = filterProfiles(allProfiles, query);
-    if (selectedBrand !== "All") {
-      list = list.filter((p) => {
-        const brands = brandAffinityMap[p.username.toLowerCase()] || brandAffinityMap[p.user_id] || [];
-        return brands.includes(selectedBrand);
-      });
-    }
-    return list;
-  }, [allProfiles, query, selectedBrand, brandAffinityMap]);
+    return filterProfiles(allProfiles, query);
+  }, [allProfiles, query]);
 
   return { allProfiles, filtered };
 }
