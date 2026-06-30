@@ -145,8 +145,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           await new Promise((r) => setTimeout(r, Math.min(waitMs, 3000)));
           continue;
         }
-        break;
-      } catch (err) {
+      } catch {
         if (attempt === 3) {
           sendJson(res, 200, { pitch: generateFallbackPitch(payload) });
           return;

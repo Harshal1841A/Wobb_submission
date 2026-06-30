@@ -28,7 +28,9 @@ export function CreatorCompareModal({ open, onClose, entries }: CreatorCompareMo
   useEffect(() => {
     if (!open || entries.length === 0) return;
     let active = true;
-    setIsLoading(true);
+    queueMicrotask(() => {
+      if (active) setIsLoading(true);
+    });
 
     Promise.all(
       entries.map(async (entry) => {
