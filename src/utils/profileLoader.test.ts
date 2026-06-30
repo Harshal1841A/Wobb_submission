@@ -1,11 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { loadBrandAffinityIndex } from './profileLoader';
+import { loadProfileByUsername } from './profileLoader';
 
 describe('profileLoader', () => {
-  it('loads brand affinity index from profiles', async () => {
-    const index = await loadBrandAffinityIndex();
-    expect(index).toBeDefined();
-    expect(index['cristiano']).toContain('Nike');
-    expect(index['instagram']).toContain('Amazon');
+  it('loads profile detail data by username', async () => {
+    const profile = await loadProfileByUsername('cristiano');
+    expect(profile).toBeDefined();
+    expect(profile?.data?.user_profile?.username).toBe('cristiano');
+  });
+
+  it('returns null for non-existent username', async () => {
+    const profile = await loadProfileByUsername('non_existent_user_12345');
+    expect(profile).toBeNull();
   });
 });

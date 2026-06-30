@@ -33,8 +33,3 @@ export function filterProfiles(
 
 export const PLATFORMS: Platform[] = ["instagram", "youtube", "tiktok"];
 
-export function getPlatformLabel(platform: Platform): string {
-  if (platform === "instagram") return "Instagram";
-  if (platform === "youtube") return "YouTube";
-  return "TikTok";
-}
