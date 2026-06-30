@@ -22,12 +22,12 @@ export function SimilarCreatorsRail({ similarUsers, platform }: SimilarCreatorsR
   if (similarUsers.length === 0) return null;
 
   return (
-    <div className="mt-8">
+    <div className="mt-12 pt-8 border-t" style={{ borderColor: "var(--border)" }}>
       <h3
-        className="text-lg font-bold mb-3"
+        className="text-lg italic tracking-tight mb-4 font-semibold"
         style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}
       >
-        Similar Creators
+        Related Profiles in Dossier System
       </h3>
       <div className="flex gap-4 overflow-x-auto pb-4 pt-1 px-1 scrollbar-thin">
         {similarUsers.map((user) => {
@@ -57,11 +57,9 @@ export function SimilarCreatorsRail({ similarUsers, platform }: SimilarCreatorsR
               tabIndex={0}
               onClick={handleClick}
               onKeyDown={handleKeyDown}
-              className="shrink-0 w-64 p-4 rounded-2xl cursor-pointer transition-all duration-150 hover:-translate-y-0.5 flex flex-col justify-between gap-3"
+              className="shrink-0 w-64 p-4 cursor-pointer transition-all duration-150 hover:border-black flex flex-col justify-between gap-3 border bg-white"
               style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                boxShadow: "var(--shadow-card)",
+                borderColor: "var(--border)",
               }}
             >
               <div className="flex items-center gap-3">
@@ -90,16 +88,15 @@ export function SimilarCreatorsRail({ similarUsers, platform }: SimilarCreatorsR
               </div>
 
               <div
-                className="h-1.5 w-full rounded-full overflow-hidden"
+                className="h-1 w-full overflow-hidden"
                 style={{ background: "var(--border)" }}
                 role="img"
                 aria-label={`Engagement ${formatEngagementRate(rate)}`}
               >
                 <div
-                  className="h-full rounded-full transition-all"
+                  className="h-full transition-all bg-black"
                   style={{
                     width: `${heatPct}%`,
-                    background: "linear-gradient(90deg, var(--accent-border), var(--accent))",
                   }}
                 />
               </div>

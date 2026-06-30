@@ -43,54 +43,58 @@ export function ProfileCard({ profile, platform }: ProfileCardProps) {
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className="group relative flex flex-col gap-3 p-4 rounded-2xl cursor-pointer transition-all duration-150 hover:-translate-y-0.5"
+      className="group relative flex flex-col gap-4 p-5 cursor-pointer transition-all duration-200 border hover:border-black"
       style={{
         background: "var(--surface)",
-        border: "1px solid var(--border)",
-        boxShadow: "var(--shadow-card)",
+        borderColor: "var(--border)",
       }}
     >
-      <div className="flex items-center gap-3">
-        <Avatar
-          src={profile.picture}
-          name={profile.fullname || profile.username}
-          alt={`${profile.fullname}'s profile picture`}
-          className="w-12 h-12 text-sm"
-        />
-        <div className="text-left flex-1 min-w-0">
-          <div className="flex items-center gap-1 font-semibold truncate" style={{ color: "var(--text)" }}>
-            <span className="truncate">@{profile.username}</span>
-            <VerifiedBadge verified={profile.is_verified} />
-          </div>
-          <div className="text-sm truncate" style={{ color: "var(--text-muted)" }}>
-            {profile.fullname}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <Avatar
+            src={profile.picture}
+            name={profile.fullname || profile.username}
+            alt={`${profile.fullname}'s profile picture`}
+            className="w-12 h-12 text-sm rounded-none border border-stone-200"
+          />
+          <div className="text-left min-w-0">
+            <div className="flex items-center gap-1.5 font-normal text-lg tracking-tight truncate" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
+              <span className="truncate italic font-medium">{profile.fullname || profile.username}</span>
+              <VerifiedBadge verified={profile.is_verified} />
+            </div>
+            <div className="text-[11px] font-mono uppercase tracking-wider truncate" style={{ color: "var(--text-muted)" }}>
+              @{profile.username}
+            </div>
           </div>
         </div>
         <AddToListButton profile={profile} platform={platform} stopPropagation />
       </div>
 
-      <div className="flex items-center justify-between gap-3 text-sm" style={{ fontFamily: "var(--font-mono)" }}>
-        <span style={{ color: "var(--text)" }}>
-          {formatCount(profile.followers)}
-          <span className="ml-1" style={{ color: "var(--text-faint)" }}>followers</span>
-        </span>
-        <span style={{ color: "var(--text)" }}>{formatEngagementRate(profile.engagement_rate)}</span>
+      <div className="pt-3 border-t flex items-center justify-between gap-3 text-xs" style={{ borderColor: "var(--surface-raised)", fontFamily: "var(--font-mono)" }}>
+        <div className="flex flex-col">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--text-faint)" }}>Audience</span>
+          <span className="font-medium text-sm" style={{ color: "var(--text)" }}>{formatCount(profile.followers)}</span>
+        </div>
+        <div className="flex flex-col text-right">
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: "var(--text-faint)" }}>Engagement</span>
+          <span className="font-medium text-sm" style={{ color: "var(--text)" }}>{formatEngagementRate(profile.engagement_rate)}</span>
+        </div>
       </div>
 
-      {/* Engagement heat bar — signature element, encodes real engagement_rate data */}
+      {/* Editorial Monochrome Index Bar */}
       <div
-        className="h-1.5 w-full rounded-full overflow-hidden"
-        style={{ background: "var(--border)" }}
+        className="h-[2px] w-full overflow-hidden"
+        style={{ background: "var(--surface-raised)" }}
         role="img"
         aria-label={`Engagement ${formatEngagementRate(profile.engagement_rate)}`}
       >
         <motion.div
-          className="h-full rounded-full"
+          className="h-full"
           initial={initialWidth}
           animate={{ width: `${heatPct}%` }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.4, ease: "easeOut" }}
           style={{
-            background: "linear-gradient(90deg, var(--accent-border), var(--accent))",
+            background: "var(--accent)",
           }}
         />
       </div>

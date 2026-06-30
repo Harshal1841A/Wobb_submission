@@ -18,15 +18,26 @@ export function SearchPage() {
 
   return (
     <Layout title="Find creators to shortlist" onOpenShortlist={() => setShortlistOpen(true)}>
-      <div className="mb-6">
+      <div className="mb-10 pb-8 border-b" style={{ borderColor: "var(--border)" }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span
+            className="px-2.5 py-0.5 text-[10px] font-mono tracking-widest uppercase border"
+            style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
+          >
+            Directory // Vol. IV
+          </span>
+          <span className="text-[11px] font-mono tracking-wider uppercase" style={{ color: "var(--text-faint)" }}>
+            Verified Creator Dossier
+          </span>
+        </div>
         <h2
-          className="text-2xl sm:text-3xl font-bold mb-1"
+          className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight mb-3"
           style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}
         >
-          Find your next creator
+          Curated <span className="italic font-normal">Intelligence.</span>
         </h2>
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Browse top accounts across Instagram, YouTube, and TikTok — shortlist the ones worth a closer look.
+        <p className="text-base sm:text-lg max-w-2xl font-light leading-relaxed" style={{ color: "var(--text-muted)" }}>
+          An uncompromising editorial index of global influence. Explore verified metrics, audience provenance, and campaign performance across Instagram, YouTube, and TikTok.
         </p>
       </div>
 

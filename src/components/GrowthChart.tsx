@@ -89,25 +89,25 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
   const hasAvgLikes = data.some((pt) => pt.avg_likes !== undefined && pt.avg_likes !== null);
 
   return (
-    <div className="mt-8 rounded-xl bg-[var(--surface)] border border-[var(--border)] p-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <div className="mt-8 border bg-white p-6" style={{ borderColor: "var(--border)" }}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
         <div>
-          <h3 className="text-base font-semibold font-[var(--font-display)] text-[var(--text)]">
-            Follower Growth & Trend
+          <h3 className="text-lg italic tracking-tight font-[var(--font-display)] text-[var(--text)]">
+            Follower Trajectory
           </h3>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Historical trajectory over time
+          <p className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] mt-0.5">
+            // Historical Audit Record
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center rounded-lg bg-[var(--surface-raised)] border border-[var(--border)] p-0.5">
+          <div className="flex items-center border p-0.5 bg-[var(--surface-raised)]" style={{ borderColor: "var(--border)" }}>
             {TIMEFRAME_OPTIONS.map(({ id, label }) => (
               <button
                 key={id}
                 onClick={() => setTimeframe(id)}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider transition-colors cursor-pointer ${
                   timeframe === id
-                    ? 'bg-[var(--accent)] text-[#0b0b10]'
+                    ? 'bg-[var(--accent)] text-[var(--on-accent)] font-bold'
                     : 'text-[var(--text-muted)] hover:text-[var(--text)]'
                 }`}
               >
@@ -117,12 +117,12 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
           </div>
 
           {hasAvgLikes && (
-            <label className="flex items-center gap-2 text-xs font-medium text-[var(--text-muted)] cursor-pointer select-none bg-[var(--surface-raised)] border border-[var(--border)] px-3 py-1.5 rounded-lg hover:border-[var(--border-strong)] transition-colors">
+            <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] cursor-pointer select-none bg-[var(--surface-raised)] border px-3 py-1.5 hover:border-black transition-colors" style={{ borderColor: "var(--border)" }}>
               <input
                 type="checkbox"
                 checked={showAvgLikes}
                 onChange={(e) => setShowAvgLikes(e.target.checked)}
-                className="rounded border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)] bg-[var(--bg)]"
+                className="rounded-none border-[var(--border)] text-[var(--accent)] focus:ring-[var(--accent)] bg-[var(--bg)]"
               />
               <span>Compare Avg Likes</span>
             </label>
@@ -137,18 +137,20 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
       >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
-            <CartesianGrid stroke="#26252f" strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#e2dfd7" strokeDasharray="2 2" vertical={false} />
             <XAxis
               dataKey="formattedMonth"
-              stroke="#8b8997"
-              fontSize={12}
+              stroke="#757472"
+              fontSize={11}
+              fontFamily="monospace"
               tickLine={false}
-              axisLine={{ stroke: '#26252f' }}
+              axisLine={{ stroke: '#e2dfd7' }}
             />
             <YAxis
               yAxisId="left"
-              stroke="#8b8997"
-              fontSize={12}
+              stroke="#757472"
+              fontSize={11}
+              fontFamily="monospace"
               tickLine={false}
               axisLine={false}
               tickFormatter={(val) => formatCount(Number(val))}
@@ -157,8 +159,9 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                stroke="#8b8997"
-                fontSize={12}
+                stroke="#757472"
+                fontSize={11}
+                fontFamily="monospace"
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(val) => formatCount(Number(val))}
@@ -166,17 +169,18 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
             )}
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1c1c26',
-                borderColor: '#34333f',
-                borderRadius: '0.5rem',
-                color: '#e8e6f0',
+                backgroundColor: '#0f0e0d',
+                borderColor: '#0f0e0d',
+                borderRadius: '0px',
+                color: '#fbf9f5',
+                fontFamily: 'monospace',
                 fontSize: '0.75rem',
               }}
               formatter={(value: unknown, name: unknown) => [
                 formatCount(Number(value)),
                 name === 'followers' ? 'Followers' : 'Avg Likes',
               ]}
-              labelStyle={{ color: '#8b8997', fontWeight: 600, marginBottom: '0.25rem' }}
+              labelStyle={{ color: '#a6a4a0', fontWeight: 600, marginBottom: '0.25rem', textTransform: 'uppercase' }}
             />
             <Line
               isAnimationActive={!shouldReduceMotion}
@@ -186,10 +190,10 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
               type="monotone"
               dataKey="followers"
               name="followers"
-              stroke="#ff5c39"
+              stroke="#0f0e0d"
               strokeWidth={2.5}
-              dot={{ fill: '#ff5c39', r: 4 }}
-              activeDot={{ r: 6, fill: '#ff5c39', stroke: '#15151d', strokeWidth: 2 }}
+              dot={{ fill: '#0f0e0d', r: 3 }}
+              activeDot={{ r: 5, fill: '#0f0e0d', stroke: '#fbf9f5', strokeWidth: 2 }}
             />
             {showAvgLikes && (
               <Line
@@ -200,11 +204,11 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({ data, isLoading }) => 
                 type="monotone"
                 dataKey="avg_likes"
                 name="avg_likes"
-                stroke="#8b8997"
-                strokeWidth={2}
+                stroke="#757472"
+                strokeWidth={1.5}
                 strokeDasharray="4 4"
-                dot={{ fill: '#8b8997', r: 3 }}
-                activeDot={{ r: 5, fill: '#8b8997', stroke: '#15151d', strokeWidth: 2 }}
+                dot={{ fill: '#757472', r: 2 }}
+                activeDot={{ r: 4, fill: '#757472', stroke: '#fbf9f5', strokeWidth: 2 }}
               />
             )}
           </LineChart>

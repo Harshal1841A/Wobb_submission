@@ -29,8 +29,8 @@ function CopyShareButton() {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors hover:border-[var(--border-strong)]"
-      style={{ background: "var(--surface-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest cursor-pointer transition-colors border hover:border-black"
+      style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}
       aria-label="Copy profile link"
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -41,10 +41,10 @@ function CopyShareButton() {
             animate={{ scale: 1, opacity: 1 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.15 }}
-            className="text-[var(--verified)] flex items-center gap-1"
+            className="text-[var(--text)] flex items-center gap-1 font-bold"
           >
-            <Check size={14} />
-            <span>Copied!</span>
+            <Check size={13} />
+            <span>COPIED</span>
           </motion.span>
         ) : (
           <motion.span
@@ -53,10 +53,10 @@ function CopyShareButton() {
             animate={{ scale: 1, opacity: 1 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.15 }}
-            className="flex items-center gap-1 text-[var(--text-muted)]"
+            className="flex items-center gap-1.5 text-[var(--text-muted)]"
           >
-            <Copy size={14} />
-            <span>Share link</span>
+            <Copy size={13} />
+            <span>SHARE DOSSIER</span>
           </motion.span>
         )}
       </AnimatePresence>
@@ -71,9 +71,9 @@ interface StatProps {
 
 function Stat({ label, value }: StatProps) {
   return (
-    <div className="p-3 rounded-xl" style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}>
-      <div className="text-xs" style={{ color: "var(--text-faint)" }}>{label}</div>
-      <div className="font-semibold mt-0.5" style={{ color: "var(--text)", fontFamily: "var(--font-mono)" }}>
+    <div className="p-3.5 border bg-white" style={{ borderColor: "var(--border)" }}>
+      <div className="text-[10px] uppercase font-mono tracking-widest" style={{ color: "var(--text-faint)" }}>{label}</div>
+      <div className="font-medium text-base sm:text-lg mt-1 tracking-tight" style={{ color: "var(--text)", fontFamily: "var(--font-mono)" }}>
         {value}
       </div>
     </div>
@@ -213,14 +213,14 @@ export function ProfileDetailPage() {
             {user.engagements !== undefined && <Stat label="Engagements" value={formatCount(user.engagements)} />}
             {user.paid_post_performance !== undefined && (
               <div
-                className="p-3 rounded-xl border-l-2 border-l-[var(--verified)]"
-                style={{ background: "var(--surface-raised)", borderTop: "1px solid var(--border)", borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}
+                className="p-3.5 border bg-white"
+                style={{ borderColor: "var(--border)" }}
               >
-                <div className="flex items-center justify-between text-xs" style={{ color: "var(--text-faint)" }}>
+                <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest" style={{ color: "var(--text-faint)" }}>
                   <span>Paid signal</span>
-                  <span className="px-1 py-0.5 rounded text-[9px] font-bold bg-[var(--verified)] text-[#0b0b10]">PRO</span>
+                  <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-black text-white">PRO</span>
                 </div>
-                <div className={`font-semibold mt-0.5 text-xs sm:text-sm ${formatPaidPerformance(user.paid_post_performance).tintClass}`}>
+                <div className={`font-medium mt-1 text-xs sm:text-sm tracking-tight ${formatPaidPerformance(user.paid_post_performance).tintClass}`}>
                   {formatPaidPerformance(user.paid_post_performance).label}
                 </div>
               </div>
@@ -228,15 +228,16 @@ export function ProfileDetailPage() {
           </div>
 
           {user.brand_affinity && user.brand_affinity.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold mb-2.5" style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}>
-                Brand Affinities
+            <div className="mt-8 pt-6 border-t" style={{ borderColor: "var(--border)" }}>
+              <h3 className="text-xs uppercase tracking-widest font-mono text-stone-400 mb-3">
+                Verified Brand Affinities //
               </h3>
               <div className="flex flex-wrap gap-2">
                 {user.brand_affinity.map((brand) => (
                   <span
                     key={brand.id}
-                    className="rounded-full bg-[var(--surface-raised)] border border-[var(--border)] px-3 py-1 text-xs text-[var(--text)]"
+                    className="border bg-white px-3 py-1 text-xs font-mono uppercase tracking-wider text-[var(--text)]"
+                    style={{ borderColor: "var(--border-strong)" }}
                   >
                     {brand.name}
                   </span>

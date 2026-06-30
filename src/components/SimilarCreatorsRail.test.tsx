@@ -30,7 +30,7 @@ describe('SimilarCreatorsRail', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Similar Creators')).toBeDefined();
+    expect(screen.getByText('Related Profiles in Dossier System')).toBeDefined();
     expect(screen.getByText('@nike')).toBeDefined();
 
     const card = screen.getByText('@nike').closest('[role="button"]')!;

@@ -1,35 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Surfaces */
-  --bg: #0b0b10;
-  --surface: #15151d;
-  --surface-raised: #1c1c26;
-  --border: #26252f;
-  --border-strong: #34333f;
+  /* Surfaces — Concept 3: Bibliothèque Noir (Swiss Minimalist Editorial) */
+  --bg: #fbf9f5;
+  --surface: #ffffff;
+  --surface-raised: #f4f1ec;
+  --border: #e5e2df;
+  --border-strong: #c8c5c1;
 
   /* Text */
-  --text: #e8e6f0;
-  --text-muted: #8b8997;
-  --text-faint: #5d5b68;
+  --text: #0f0e0d;
+  --text-muted: #5e5d5a;
+  --text-faint: #8a8885;
 
-  /* Accent — warm vermilion, the "creator heat" signature color */
-  --accent: #ff5c39;
-  --accent-soft: rgba(255, 92, 57, 0.14);
-  --accent-border: rgba(255, 92, 57, 0.4);
+  /* Accent — Stark jet black editorial contrast */
+  --accent: #0f0e0d;
+  --on-accent: #fbf9f5;
+  --accent-soft: rgba(15, 14, 13, 0.06);
+  --accent-border: rgba(15, 14, 13, 0.25);
 
   /* Status */
-  --verified: #4da3ff;
-  --danger: #ff5c5c;
+  --verified: #0f0e0d;
+  --danger: #ba1a1a;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
-  --shadow-pop: 0 12px 40px -12px rgba(0, 0, 0, 0.65);
+  /* Elevation & Depth: Flat printed matter aesthetic */
+  --shadow-card: none;
+  --shadow-pop: 0 20px 40px -15px rgba(15, 14, 13, 0.08);
 
-  --font-display: "Sora", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {

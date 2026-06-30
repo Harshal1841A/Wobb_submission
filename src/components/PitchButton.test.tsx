@@ -31,7 +31,7 @@ describe("PitchButton", () => {
 
     render(<PitchButton profile={mockProfile} platform="instagram" />);
 
-    const btn = screen.getByText("Generate pitch");
+    const btn = screen.getByText("Generate Dossier Memo");
     expect(btn).toBeDefined();
 
     fireEvent.click(btn);
@@ -51,7 +51,7 @@ describe("PitchButton", () => {
 
     render(<PitchButton profile={mockProfile} platform="instagram" />);
 
-    fireEvent.click(screen.getByText("Generate pitch"));
+    fireEvent.click(screen.getByText("Generate Dossier Memo"));
 
     await waitFor(() => {
       expect(screen.getByText("Cached pitch result.")).toBeDefined();
@@ -59,7 +59,7 @@ describe("PitchButton", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     // Click again
-    fireEvent.click(screen.getByText("Generate pitch"));
+    fireEvent.click(screen.getByText("Generate Dossier Memo"));
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -72,7 +72,7 @@ describe("PitchButton", () => {
 
     render(<PitchButton profile={mockProfile} platform="instagram" />);
 
-    fireEvent.click(screen.getByText("Generate pitch"));
+    fireEvent.click(screen.getByText("Generate Dossier Memo"));
 
     await waitFor(() => {
       expect(screen.getByText("Couldn't generate a pitch right now — try again in a moment.")).toBeDefined();

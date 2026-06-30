@@ -73,22 +73,22 @@ export function ShortlistPanel({ open, onClose }: ShortlistPanelProps) {
               style={{ borderColor: "var(--border)" }}
             >
               <h2
-                className="font-semibold text-base"
+                className="font-semibold text-lg italic tracking-tight"
                 style={{ fontFamily: "var(--font-display)", color: "var(--text)" }}
               >
-                Shortlist
-                <span className="ml-2 font-normal text-sm" style={{ color: "var(--text-muted)" }}>
-                  {entries.length} {entries.length === 1 ? "profile" : "profiles"}
+                Dossier Selection
+                <span className="ml-2 font-mono not-italic text-xs uppercase" style={{ color: "var(--text-muted)" }}>
+                  [{entries.length}]
                 </span>
               </h2>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close shortlist"
-                className="p-1.5 rounded-md cursor-pointer transition-colors hover:opacity-80"
-                style={{ color: "var(--text-muted)" }}
+                className="p-1.5 cursor-pointer transition-colors hover:opacity-80 border"
+                style={{ color: "var(--text)", borderColor: "var(--border)" }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
@@ -101,8 +101,8 @@ export function ShortlistPanel({ open, onClose }: ShortlistPanelProps) {
                   <div
                     role="tablist"
                     aria-label="Filter shortlist by platform"
-                    className="flex gap-1 p-1 rounded-lg w-fit"
-                    style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}
+                    className="flex gap-1 p-1 w-fit border"
+                    style={{ background: "var(--surface-raised)", borderColor: "var(--border)" }}
                   >
                     {(["all", ...PLATFORMS] as const).map((p) => {
                       const isSelected = platformFilter === p;
@@ -114,10 +114,10 @@ export function ShortlistPanel({ open, onClose }: ShortlistPanelProps) {
                           role="tab"
                           aria-selected={isSelected}
                           onClick={() => setPlatformFilter(p)}
-                          className="px-2.5 py-1 rounded-md text-xs font-medium cursor-pointer transition-all"
+                          className="px-2.5 py-1 text-xs font-mono uppercase tracking-wider cursor-pointer transition-all"
                           style={
                             isSelected
-                              ? { background: "var(--accent)", color: "#0b0b10" }
+                              ? { background: "var(--accent)", color: "var(--on-accent)" }
                               : { background: "transparent", color: "var(--text-muted)" }
                           }
                         >

@@ -14,7 +14,7 @@ describe("GrowthChart", () => {
       { month: "2023-02", followers: 200, avg_likes: 20 },
     ];
     render(<GrowthChart data={mockData} />);
-    expect(screen.getByText("Follower Growth & Trend")).toBeDefined();
+    expect(screen.getByText("Follower Trajectory")).toBeDefined();
     const checkbox = screen.getByLabelText("Compare Avg Likes") as HTMLInputElement;
     expect(checkbox).toBeDefined();
     expect(checkbox.checked).toBe(false);
