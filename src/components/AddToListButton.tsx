@@ -1,4 +1,5 @@
 import { Check, Plus } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import type { Platform, UserProfileSummary } from "@/types";
 import { useShortlistStore } from "@/store/shortlistStore";
 
@@ -7,6 +8,24 @@ interface AddToListButtonProps {
   platform: Platform;
   variant?: "compact" | "full";
   stopPropagation?: boolean;
+}
+
+function AnimatedSwapIcon({ isAdded }: { isAdded: boolean }) {
+  const shouldReduceMotion = useReducedMotion();
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.span
+        key={isAdded ? "check" : "plus"}
+        initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.6 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={shouldReduceMotion ? { opacity: 0, scale: 1 } : { opacity: 0, scale: 0.6 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 0.15 }}
+        className="flex items-center justify-center"
+      >
+        {isAdded ? <Check size={16} /> : <Plus size={16} />}
+      </motion.span>
+    </AnimatePresence>
+  );
 }
 
 export function AddToListButton({
@@ -38,7 +57,7 @@ export function AddToListButton({
             : { background: "var(--accent)", color: "#0b0b10", border: "1px solid var(--accent)" }
         }
       >
-        {isAdded ? <Check size={16} /> : <Plus size={16} />}
+        <AnimatedSwapIcon isAdded={isAdded} />
         {isAdded ? "Added to shortlist" : "Add to shortlist"}
       </button>
     );
@@ -59,7 +78,8 @@ export function AddToListButton({
           : { background: "var(--surface-raised)", color: "var(--text-muted)", border: "1px solid var(--border-strong)" }
       }
     >
-      {isAdded ? <Check size={16} /> : <Plus size={16} />}
+      <AnimatedSwapIcon isAdded={isAdded} />
     </button>
   );
 }
+

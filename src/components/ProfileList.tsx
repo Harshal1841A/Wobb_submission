@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import type { Platform, UserProfileSummary } from "@/types";
 import { ProfileCard } from "./ProfileCard";
 import { SearchX } from "lucide-react";
@@ -9,6 +10,32 @@ export const VIRTUALIZE_THRESHOLD = 30;
 interface ProfileListProps {
   profiles: UserProfileSummary[];
   platform: Platform;
+}
+
+interface AnimatedListItemProps {
+  children: React.ReactNode;
+  index: number;
+  userId?: string;
+}
+
+function AnimatedListItem({ children, index, userId }: AnimatedListItemProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const delay = shouldReduceMotion ? 0 : index < 20 ? index * 0.03 : 0;
+
+  return (
+    <motion.li
+      data-userid={userId}
+      initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: shouldReduceMotion ? 0 : 0.2,
+        delay,
+        ease: "easeOut",
+      }}
+    >
+      {children}
+    </motion.li>
+  );
 }
 
 function useColumnCount() {
@@ -122,11 +149,14 @@ function VirtualizedProfileGrid({ profiles, platform }: ProfileListProps) {
             }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0 m-0 pb-4"
           >
-            {rowProfiles.map((profile) => (
-              <li key={profile.user_id} data-userid={profile.user_id}>
-                <ProfileCard profile={profile} platform={platform} />
-              </li>
-            ))}
+            {rowProfiles.map((profile, colIdx) => {
+              const itemIndex = virtualRow.index * columns + colIdx;
+              return (
+                <AnimatedListItem key={profile.user_id} index={itemIndex} userId={profile.user_id}>
+                  <ProfileCard profile={profile} platform={platform} />
+                </AnimatedListItem>
+              );
+            })}
           </ul>
         );
       })}
@@ -153,11 +183,12 @@ export function ProfileList({ profiles, platform }: ProfileListProps) {
 
   return (
     <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 list-none p-0 m-0">
-      {profiles.map((profile) => (
-        <li key={profile.user_id}>
+      {profiles.map((profile, index) => (
+        <AnimatedListItem key={profile.user_id} index={index} userId={profile.user_id}>
           <ProfileCard profile={profile} platform={platform} />
-        </li>
+        </AnimatedListItem>
       ))}
     </ul>
   );
 }
+

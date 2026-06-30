@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { motion, useReducedMotion } from "motion/react";
 import type { Platform, UserProfileSummary } from "@/types";
 import { VerifiedBadge } from "./VerifiedBadge";
 import { AddToListButton } from "./AddToListButton";
@@ -19,6 +20,7 @@ function engagementHeatPct(rate: number | undefined): number {
 
 export function ProfileCard({ profile, platform }: ProfileCardProps) {
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
 
   const handleClick = () => {
     navigate(`/profile/${profile.username}?platform=${platform}`);
@@ -32,6 +34,7 @@ export function ProfileCard({ profile, platform }: ProfileCardProps) {
   };
 
   const heatPct = engagementHeatPct(profile.engagement_rate);
+  const initialWidth = shouldReduceMotion ? false : { width: 0 };
 
   return (
     <div
@@ -81,10 +84,12 @@ export function ProfileCard({ profile, platform }: ProfileCardProps) {
         role="img"
         aria-label={`Engagement ${formatEngagementRate(profile.engagement_rate)}`}
       >
-        <div
-          className="h-full rounded-full transition-all"
+        <motion.div
+          className="h-full rounded-full"
+          initial={initialWidth}
+          animate={{ width: `${heatPct}%` }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.4, ease: "easeOut" }}
           style={{
-            width: `${heatPct}%`,
             background: "linear-gradient(90deg, var(--accent-border), var(--accent))",
           }}
         />
@@ -92,3 +97,5 @@ export function ProfileCard({ profile, platform }: ProfileCardProps) {
     </div>
   );
 }
+
+
