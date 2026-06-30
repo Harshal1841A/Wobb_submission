@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Avatar, getInitials } from "./Avatar";
+import { Avatar } from "./Avatar";
+import { getInitials } from "../lib/avatarHelpers";
 
 describe("getInitials", () => {
   it("extracts initials from multi-word names", () => {
