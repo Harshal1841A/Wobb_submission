@@ -51,6 +51,14 @@ Kept the visual identity intentional rather than templated:
 - **Similar Creators Rail**: Horizontally scrollable mini-cards rail at the bottom of ProfileDetailPage with engagement heat bar and navigation fallback.
 - **AI Creator Pitch Generator**: Serverless Vercel function proxying NVIDIA Nemotron LLM API (`api/pitch.ts`) with Vite dev middleware (`vite.config.ts`), local session caching, and inline error handling on `ProfileDetailPage`.
 
+### Motion Pass (Framer Motion)
+Implemented restrained, purposeful UI animations gated by `useReducedMotion()` from `motion/react`:
+- **Card & List Dynamics**: Subtly staggered reveal animations (`staggerChildren: 0.04s`) on the search result grid, smooth hover lift (`whileHover={{ y: -3 }}`), animated shortlist button swap icon (`AnimatePresence`), and animated engagement heat bar fill on mount (~400ms easeOut).
+- **Shortlist Panel Transitions**: Slide-in/slide-out drawer animation (`initial={{ x: "100%" }}`), backdrop fade, and smooth list item enter/exit/reorder layout animations (`layout="position"`).
+- **Pulse/Shimmer Skeletons**: Built a reusable `<Skeleton>` component (`src/components/Skeleton.tsx`) replacing bare spinners across `ProfileDetailPage`, `GrowthChart`, and `PitchButton` with a 1.5s infinite shimmer gradient. Added layout morphing (`layout`) for chart timeframe tabs and pitch generator expansion.
+- **Route Transitions**: Wrapped main application routes in `App.tsx` with `<AnimatePresence mode="wait">` for clean cross-fade transitions (~150ms out, ~200ms in) between search and profile detail views.
+- **Tasteful Polish**: Added an interactive **Copy Share Link** button on `ProfileDetailPage` with an animated morph from copy icon to checkmark on click (~150ms spring/fade), plus a subtle hover tilt/scale effect on the profile picture.
+
 ### Code quality / structure
 ```
 src/
@@ -67,6 +75,7 @@ src/
 - Race condition guard in `ProfileDetailPage`: if you navigate between two profiles quickly, a stale fetch response can no longer overwrite the newer one
 
 ## Libraries added
+- `motion` (`motion/react`) — Framer Motion for high-performance, accessible UI micro-interactions
 - `zustand` — shortlist state + persistence
 - `@hello-pangea/dnd` — drag-to-reorder in shortlist panel (React 19 compatible)
 - `@tanstack/react-virtual` — window/container virtualization for profile grid

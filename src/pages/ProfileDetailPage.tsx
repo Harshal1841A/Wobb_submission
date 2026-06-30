@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, Check, Copy, ExternalLink } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Layout } from "@/components/Layout";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { AddToListButton } from "@/components/AddToListButton";
@@ -12,6 +13,54 @@ import type { FullUserProfile, Platform, ProfileDetailResponse } from "@/types";
 import { formatCount, formatEngagementRate, formatPlatformLabel, formatPaidPerformance } from "@/lib/formatters";
 import { loadProfileByUsername } from "@/utils/profileLoader";
 import { Skeleton } from "@/components/Skeleton";
+
+function CopyShareButton() {
+  const [copied, setCopied] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+
+  const handleCopy = () => {
+    navigator.clipboard?.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors hover:border-[var(--border-strong)]"
+      style={{ background: "var(--surface-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
+      aria-label="Copy profile link"
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        {copied ? (
+          <motion.span
+            key="check"
+            initial={shouldReduceMotion ? { opacity: 1 } : { scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.15 }}
+            className="text-[var(--verified)] flex items-center gap-1"
+          >
+            <Check size={14} />
+            <span>Copied!</span>
+          </motion.span>
+        ) : (
+          <motion.span
+            key="copy"
+            initial={shouldReduceMotion ? { opacity: 1 } : { scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.15 }}
+            className="flex items-center gap-1 text-[var(--text-muted)]"
+          >
+            <Copy size={14} />
+            <span>Share link</span>
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </button>
+  );
+}
 
 interface StatProps {
   label: string;
@@ -36,6 +85,7 @@ export function ProfileDetailPage() {
   const [profileData, setProfileData] = useState<ProfileDetailResponse | null>(null);
   const [fetchedFor, setFetchedFor] = useState<string | null>(null);
   const [shortlistOpen, setShortlistOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!username) return;
@@ -117,11 +167,13 @@ export function ProfileDetailPage() {
       </Link>
 
       <div className="flex flex-col sm:flex-row gap-6 items-start max-w-2xl">
-        <img
+        <motion.img
           src={user.picture}
           alt={`${user.fullname}'s profile picture`}
-          className="w-24 h-24 rounded-full object-cover shrink-0"
+          className="w-24 h-24 rounded-full object-cover shrink-0 cursor-pointer"
           style={{ border: "1px solid var(--border-strong)" }}
+          whileHover={shouldReduceMotion ? {} : { scale: 1.05, rotate: 3 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
         />
         <div className="flex-1 text-left min-w-0">
           <h2
@@ -191,6 +243,7 @@ export function ProfileDetailPage() {
           <div className="flex flex-wrap items-center gap-3 mt-4">
             <AddToListButton profile={user} platform={knownPlatform} variant="full" />
             <PitchButton profile={user} platform={knownPlatform} />
+            <CopyShareButton />
             {user.url && (
               <a
                 href={user.url}
